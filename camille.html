@@ -1,0 +1,1649 @@
+<title>Camille French Tutor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+:root {
+  /* Layout: one centred column; chat fills the screen like a messaging app. */
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface-2: #eaeef7;
+  --text: #171a24;
+  --muted: #5d6475;
+  --line: #dde2ee;
+  --blue: #1f4fd1;
+  --blue-soft: #e4ebfd;
+  --red: #d7263d;
+  --red-soft: #fde8eb;
+  --green: #1c8a4a;
+  --green-soft: #e3f4ea;
+  --amber: #e9a400;
+  --amber-soft: #fff4d6;
+  --tutor: #ffffff;
+  --me: #1f4fd1;
+  --me-text: #ffffff;
+  --on-accent: #ffffff;
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(20,30,70,.05), 0 4px 16px rgba(20,30,70,.06);
+  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12141b;
+    --surface: #1b1e27;
+    --surface-2: #252935;
+    --text: #e9ebf2;
+    --muted: #9ba1b3;
+    --line: #2f3442;
+    --blue: #86a3ff;
+    --blue-soft: #222b47;
+    --red: #ff7385;
+    --red-soft: #3a2229;
+    --green: #5fd18f;
+    --green-soft: #1b3226;
+    --amber: #f0b429;
+    --amber-soft: #3a3120;
+    --tutor: #1b1e27;
+    --me: #3d5fe0;
+    --me-text: #ffffff;
+    --on-accent: #0d1430;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+    --bg: #12141b;
+    --surface: #1b1e27;
+    --surface-2: #252935;
+    --text: #e9ebf2;
+    --muted: #9ba1b3;
+    --line: #2f3442;
+    --blue: #86a3ff;
+    --blue-soft: #222b47;
+    --red: #ff7385;
+    --red-soft: #3a2229;
+    --green: #5fd18f;
+    --green-soft: #1b3226;
+    --amber: #f0b429;
+    --amber-soft: #3a3120;
+    --tutor: #1b1e27;
+    --me: #3d5fe0;
+    --me-text: #ffffff;
+    --on-accent: #0d1430;
+    --shadow: none;
+    color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 var(--font-body);
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+h1, h2, h3 { line-height: 1.2; margin: 0 0 .4em; font-family: var(--font-display); font-weight: 800; text-wrap: balance; }
+.muted { color: var(--muted); }
+.tiny { font-size: .8rem; }
+
+/* Top bar */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; background: none; border: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; padding: 0; }
+.flag { display: inline-flex; width: 26px; height: 18px; border-radius: 3px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
+.flag i { flex: 1; }
+.flag i:nth-child(1) { background: #1f4fd1; }
+.flag i:nth-child(2) { background: #ffffff; }
+.flag i:nth-child(3) { background: #d7263d; }
+.stats { display: flex; align-items: center; gap: 12px; font-size: .9rem; font-weight: 600; }
+.icon-btn { background: none; border: 0; font-size: 1.2rem; padding: 6px; border-radius: 10px; line-height: 1; }
+.icon-btn:hover { background: var(--surface-2); }
+
+/* Views */
+.view { width: 100%; max-width: 760px; margin: 0 auto; padding: 16px 16px 40px; }
+.view-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.view-head h2 { margin: 0; }
+.back { background: var(--surface-2); border: 0; border-radius: 10px; width: 38px; height: 38px; font-size: 1.1rem; flex: none; }
+.section-title { margin: 28px 0 12px; font-size: 1.05rem; }
+
+.hero h1 { font-size: 1.8rem; margin-top: 8px; }
+.sub { margin: 0 0 10px; color: var(--muted); }
+.plan { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 8px; }
+.plan li {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 14px; cursor: pointer;
+}
+.plan li .check { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: .8rem; flex: none; }
+.plan li.done .check { background: var(--green); border-color: var(--green); color: var(--on-accent); }
+.plan li.done b { text-decoration: line-through; color: var(--muted); }
+.plan li small { color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 18px; box-shadow: var(--shadow); margin-bottom: 14px;
+}
+.card summary { cursor: pointer; font-weight: 600; }
+.lesson-card { border-top: 4px solid var(--blue); }
+.eyebrow { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--blue); font-weight: 700; margin-bottom: 6px; }
+.progress { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin: 14px 0 4px; }
+.progress > div { height: 100%; background: linear-gradient(90deg, var(--blue), var(--red)); border-radius: 99px; transition: width .4s; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 12px;
+  padding: 10px 16px; font-weight: 600;
+}
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.small { padding: 6px 12px; font-size: .9rem; }
+.btn.danger { color: var(--red); }
+.btn:disabled { opacity: .5; cursor: default; }
+.lesson-card .btn { margin-top: 12px; width: 100%; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.tile {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+  box-shadow: var(--shadow);
+}
+.tile:hover { border-color: var(--blue); }
+.tile span { font-size: 1.6rem; }
+.tile small { color: var(--muted); font-size: .82rem; }
+
+/* Course list */
+.week { margin-bottom: 14px; }
+.week h3 { font-size: .95rem; margin: 18px 0 8px; }
+.day {
+  display: flex; gap: 10px; align-items: center; width: 100%; text-align: left;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; margin-bottom: 6px;
+}
+.day .n { font-size: .78rem; color: var(--muted); width: 48px; flex: none; }
+.day.done { opacity: .65; }
+.day.done .n::after { content: " ✓"; color: var(--green); }
+.day.current { border-color: var(--blue); background: var(--blue-soft); font-weight: 600; }
+
+/* Chat */
+.chat-view { display: flex; flex-direction: column; padding: 0; flex: 1; min-height: 0; height: calc(100dvh - 57px); }
+.chat-head { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.chat-title { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.chat-title small { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.msg { max-width: 88%; padding: 10px 14px; border-radius: 18px; overflow-wrap: anywhere; }
+.msg.me { align-self: flex-end; background: var(--me); color: var(--me-text); border-bottom-right-radius: 6px; white-space: pre-wrap; }
+.msg.tutor { align-self: flex-start; background: var(--tutor); border: 1px solid var(--line); border-bottom-left-radius: 6px; box-shadow: var(--shadow); }
+.msg.tutor p { margin: 0 0 .55em; }
+.msg.tutor p:last-child { margin-bottom: 0; }
+.msg.tutor ul, .msg.tutor ol { margin: .3em 0 .6em; padding-left: 1.3em; }
+.msg.tutor li { margin: .15em 0; }
+.msg.tutor h4 { margin: .4em 0 .3em; font-size: 1rem; }
+.msg.tutor code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
+.msg.error { align-self: center; background: var(--red-soft); color: var(--red); font-size: .9rem; }
+.msg .tools { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.msg .tools button { background: var(--surface-2); border: 0; border-radius: 99px; padding: 3px 10px; font-size: .8rem; color: var(--muted); }
+.msg .tools button:hover { color: var(--text); }
+.typing::after { content: "▍"; animation: blink 1s steps(1) infinite; color: var(--blue); }
+@keyframes blink { 50% { opacity: 0; } }
+
+.gloss {
+  border-bottom: 2px dotted var(--blue); cursor: pointer; border-radius: 2px;
+  background: linear-gradient(transparent 70%, var(--blue-soft) 70%);
+}
+.gloss.saved { border-bottom-style: solid; border-bottom-color: var(--green); }
+.correction {
+  background: var(--amber-soft); border-left: 4px solid var(--amber); border-radius: 8px;
+  padding: 6px 10px; margin: 0 0 .5em; font-size: .95rem;
+}
+.correction del { color: var(--red); }
+.hint { background: var(--green-soft); border-radius: 8px; padding: 6px 10px; margin: 0 0 .5em; }
+.ecoute {
+  background: var(--blue-soft); border-radius: 12px; padding: 10px 12px; margin: .3em 0 .6em;
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+}
+.ecoute::before { content: "🎧"; font-size: 1.3rem; margin-right: 4px; }
+.ecoute button { border: 0; background: var(--surface); border-radius: 99px; padding: 5px 12px; font-size: .88rem; font-weight: 600; }
+.ecoute .transcript { flex-basis: 100%; margin-top: 6px; font-style: italic; white-space: pre-wrap; }
+.ecoute.pending { opacity: .7; font-style: italic; }
+
+.composer { border-top: 1px solid var(--line); padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--bg); }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 8px; scrollbar-width: none; }
+.chips button { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 5px 12px; font-size: .85rem; }
+.chips button.finish { background: var(--green); color: var(--on-accent); border-color: var(--green); font-weight: 600; }
+#composer-form { display: flex; align-items: flex-end; gap: 8px; }
+#input {
+  flex: 1; resize: none; border: 1px solid var(--line); background: var(--surface); border-radius: 14px;
+  padding: 10px 14px; max-height: 140px; outline: none;
+}
+#input:focus { border-color: var(--blue); }
+.send { border-radius: 50%; width: 44px; height: 44px; padding: 0; font-size: 1.1rem; }
+.mic { width: 44px; height: 44px; font-size: 1.3rem; }
+.mic.listening { background: var(--red-soft); animation: pulse 1.2s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px var(--red-soft); } }
+
+/* Flashcards */
+.flashcard {
+  min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px; box-shadow: var(--shadow);
+  margin-bottom: 12px; gap: 8px;
+}
+.flashcard .prompt { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.flashcard .front { font-size: 1.7rem; font-weight: 700; }
+.flashcard .front, .flashcard .answer { width: 100%; overflow-wrap: anywhere; }
+.flashcard .answer { font-size: 1.3rem; color: var(--blue); line-height: 1.3; }
+.grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+.grades button { padding: 10px 4px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: .9rem; }
+.grades button small { display: block; font-weight: 400; color: var(--muted); font-size: .75rem; }
+.grades .again { color: var(--red); }
+.grades .good { color: var(--green); }
+.word-list { list-style: none; padding: 0; margin: 10px 0 0; max-height: 360px; overflow-y: auto; }
+.word-list li { display: flex; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.word-list li span { flex: 1; }
+.word-list li button { background: none; border: 0; color: var(--muted); }
+.empty { text-align: center; padding: 30px 10px; }
+
+/* Forms / dialog */
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.row.end { justify-content: flex-end; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: .9rem; font-weight: 600; }
+input, select { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 9px 12px; font-weight: 400; width: 100%; }
+#word-search { margin-top: 10px; }
+fieldset { border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 10px; }
+dialog {
+  border: 0; border-radius: 20px; padding: 22px; width: min(480px, calc(100vw - 32px));
+  background: var(--surface); color: var(--text); box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+dialog::backdrop { background: rgba(0,0,0,.4); }
+
+.popover {
+  position: fixed; z-index: 50; background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); max-width: 280px;
+}
+.popover .fr { font-weight: 700; font-size: 1.1rem; }
+.popover .en { color: var(--muted); margin-bottom: 8px; }
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 60;
+  background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 99px; font-weight: 600; font-size: .9rem;
+  max-width: calc(100vw - 32px); text-align: center;
+}
+
+label.check { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 600; }
+label.check input { width: auto; }
+label.check small { flex-basis: 100%; font-weight: 400; }
+.thinking { color: var(--muted); font-style: italic; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+</style>
+<header class="topbar">
+    <button class="brand" data-go="home" aria-label="Accueil">
+      <span class="flag" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>Camille</span>
+    </button>
+    <div class="stats">
+      <span id="stat-countdown" title="Jours avant le départ"></span>
+      <span id="stat-streak" title="Jours d'affilée"></span>
+      <button id="btn-settings" class="icon-btn" aria-label="Réglages">⚙️</button>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <main id="view-home" class="view">
+    <section class="hero">
+      <h1 id="hello">Bonjour !</h1>
+      <p class="sub" id="hello-sub">Ton plan de 30 minutes pour aujourd'hui :</p>
+      <ol class="plan" id="today-plan"></ol>
+    </section>
+
+    <section class="card lesson-card">
+      <div class="eyebrow" id="lesson-eyebrow"></div>
+      <h2 id="lesson-title"></h2>
+      <p class="muted" id="lesson-goals"></p>
+      <div class="progress"><div id="course-bar"></div></div>
+      <p class="tiny muted" id="course-label"></p>
+      <button class="btn primary" id="btn-lesson">Commencer la leçon</button>
+    </section>
+
+    <section>
+      <h3 class="section-title">S'entraîner</h3>
+      <div class="grid">
+        <button class="tile" data-go="situations"><span>🎭</span><b>Situations</b><small>Role-play real life in France</small></button>
+        <button class="tile" data-mode="listening"><span>🎧</span><b>Écoute</b><small>Train your ear</small></button>
+        <button class="tile" data-mode="academic"><span>🎓</span><b>Français académique</b><small>Lectures, emails, class</small></button>
+        <button class="tile" data-mode="free"><span>💬</span><b>Conversation libre</b><small>Chat about anything</small></button>
+        <button class="tile" data-go="cards"><span>🃏</span><b>Mes cartes</b><small id="tile-cards">Spaced repetition</small></button>
+        <button class="tile" data-go="course"><span>🗺️</span><b>Le programme</b><small>12 weeks to France</small></button>
+      </div>
+    </section>
+  </main>
+
+  <!-- SITUATIONS -->
+  <main id="view-situations" class="view" hidden>
+    <div class="view-head"><button class="back" data-go="home">←</button><h2>Situations</h2></div>
+    <p class="muted">Pick a scene. Camille plays the other person. You'll get help if you get stuck, and a debrief at the end.</p>
+    <div class="grid" id="scenario-grid"></div>
+  </main>
+
+  <!-- COURSE -->
+  <main id="view-course" class="view" hidden>
+    <div class="view-head"><button class="back" data-go="home">←</button><h2>Le programme</h2></div>
+    <p class="muted">12 weeks, 6 lessons + 1 review per week. Tap a lesson to (re)do it.</p>
+    <div id="course-list"></div>
+  </main>
+
+  <!-- CHAT -->
+  <main id="view-chat" class="view chat-view" hidden>
+    <div class="chat-head">
+      <button class="back" id="chat-back">←</button>
+      <div class="chat-title"><b id="chat-title"></b><small id="chat-sub"></small></div>
+      <button class="icon-btn" id="btn-autospeak" title="Lire les réponses à voix haute">🔈</button>
+      <button class="icon-btn" id="btn-restart" title="Recommencer">↺</button>
+    </div>
+    <div id="messages" class="messages" aria-live="polite"></div>
+    <div class="composer">
+      <div class="chips" id="chips">
+        <button data-say="Peux-tu expliquer ça en anglais ?">🇬🇧 En anglais</button>
+        <button data-say="Plus simple, s'il te plaît !">🐢 Plus simple</button>
+        <button data-say="Je peux avoir un indice ?">💡 Indice</button>
+        <button data-say="On continue !">⏭️ Suivant</button>
+        <button id="btn-finish" class="finish" hidden>✅ Leçon terminée</button>
+      </div>
+      <form id="composer-form">
+        <textarea id="input" rows="1" placeholder="Écris en français…" autocomplete="off"></textarea>
+        <button type="submit" class="btn primary send" id="btn-send" aria-label="Envoyer">➤</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- CARDS -->
+  <main id="view-cards" class="view" hidden>
+    <div class="view-head"><button class="back" data-go="home">←</button><h2>Mes cartes</h2></div>
+    <p class="muted" id="cards-summary"></p>
+    <div id="review-area"></div>
+    <details class="card">
+      <summary>➕ Ajouter un mot</summary>
+      <form id="add-card-form" class="stack">
+        <input name="fr" placeholder="Français (ex : le loyer)" required>
+        <input name="en" placeholder="English (e.g. the rent)" required>
+        <button class="btn">Ajouter</button>
+      </form>
+    </details>
+    <details class="card">
+      <summary id="word-list-summary">📚 Tous mes mots</summary>
+      <input id="word-search" placeholder="Rechercher…">
+      <ul id="word-list" class="word-list"></ul>
+    </details>
+  </main>
+
+  <!-- SETTINGS / ONBOARDING -->
+  <dialog id="settings">
+    <form method="dialog" id="settings-form" class="stack">
+      <h2 id="settings-title">Réglages</h2>
+      <p class="muted" id="settings-intro" hidden>Bienvenue ! Tell Camille a little about yourself so lessons fit your life in France.</p>
+      <label>Ton prénom <input name="name" placeholder="e.g. Ben"></label>
+      <label>Languages you already speak <input name="native" placeholder="e.g. English, Cantonese"></label>
+      <label>Where are you going? <input name="destination" placeholder="e.g. Université de Lyon"></label>
+      <label>What will you study? <input name="field" placeholder="e.g. Business, Engineering"></label>
+      <label>Departure date <input name="departure" type="date"></label>
+      <fieldset class="voice-settings">
+        <legend>Voix</legend>
+        <label>French voice <select name="voice" id="voice-select"></select></label>
+        <label>Speed <input name="rate" type="range" min="0.6" max="1.2" step="0.05"></label>
+        <button type="button" class="btn small" id="btn-test-voice">🔊 Tester</button>
+      </fieldset>
+      <label class="check"><input type="checkbox" name="rich" id="rich"> Richer, slower replies <small class="muted">Off: Camille answers fast. On: more careful answers that take longer.</small></label>
+      <details id="data-tools">
+        <summary>Données</summary>
+        <p class="tiny muted" id="sync-status">Checking where your progress is saved…</p>
+        <button type="button" class="btn small danger" id="btn-reset">Tout effacer</button>
+      </details>
+      <div class="row end">
+        <button class="btn primary" value="save">C'est parti !</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm">
+    <form method="dialog" class="stack">
+      <p id="confirm-text"></p>
+      <div class="row end">
+        <button class="btn" value="cancel">Annuler</button>
+        <button class="btn primary" value="ok" id="confirm-ok">Oui</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="popover" class="popover" hidden></div>
+  <div id="toast" class="toast" hidden></div>
+<script type="module">
+// ---- curriculum.js ----
+// 12-week plan from complete beginner to confident A2 (with B1 skills for daily life and university).
+// 6 lesson days + 1 review day per week, about 20 minutes each.
+// Shared by the browser (lesson picker) and the server (lesson prompt).
+
+const WEEKS = [
+  {
+    theme: "Bonjour ! Premiers pas",
+    days: [
+      { t: "Saluer et se présenter", g: "bonjour/salut/au revoir, je m'appelle…, ça va ?, tu vs vous, pronunciation of silent final letters" },
+      { t: "L'alphabet et épeler son nom", g: "alphabet, spelling your name and email (arobase, point), French vowel sounds u/ou, é/è" },
+      { t: "Les nombres 0–20", g: "numbers 0–20, age (j'ai … ans), phone numbers said in pairs" },
+      { t: "Le verbe être et les nationalités", g: "être in present, nationalities masculine/feminine, je suis étudiant(e)" },
+      { t: "D'où viens-tu ?", g: "je viens de…, j'habite à…, countries with en/au, intonation questions" },
+      { t: "Les mots de politesse", g: "s'il vous plaît, merci, pardon, excusez-moi, je ne comprends pas, vous pouvez répéter ?" },
+      { t: "Révision semaine 1", g: "review + mini-test: introduce yourself fully, spell your name, give your phone number", review: true },
+    ],
+  },
+  {
+    theme: "Ma vie, ma famille",
+    days: [
+      { t: "Le verbe avoir", g: "avoir in present, j'ai un frère/une sœur, j'ai faim/soif/froid" },
+      { t: "Les articles : un, une, le, la, les", g: "definite/indefinite articles, noun gender tips, plural" },
+      { t: "La famille", g: "family members, possessives mon/ma/mes, ton/ta/tes" },
+      { t: "Les nombres jusqu'à 100", g: "numbers 20–100 including soixante-dix, quatre-vingts, quatre-vingt-dix; prices and years" },
+      { t: "Les jours, les mois, la date", g: "days, months, quel jour sommes-nous ?, c'est le 3 septembre, birthday" },
+      { t: "Poser des questions", g: "est-ce que, qu'est-ce que, où, quand, comment, pourquoi, combien" },
+      { t: "Révision semaine 2", g: "review + mini-test: talk about your family, dates, ask 5 questions", review: true },
+    ],
+  },
+  {
+    theme: "Manger et faire les courses",
+    days: [
+      { t: "À la boulangerie", g: "je voudrais…, une baguette, un croissant, c'est combien ?, paying (par carte, sans contact)" },
+      { t: "Les verbes en -er", g: "present of -er verbs (parler, aimer, habiter, manger), j'aime / je n'aime pas" },
+      { t: "Au café", g: "ordering drinks, un café, un crème, l'addition s'il vous plaît, sur place ou à emporter" },
+      { t: "Le partitif", g: "du, de la, des, de l'; pas de; quantities (un kilo de, un paquet de, beaucoup de)" },
+      { t: "Au supermarché et au marché", g: "food vocabulary, where is…?, c'est en promo, la caisse, un sac" },
+      { t: "Au restaurant universitaire", g: "le RU / le Crous, menu items, je prends…, vegetarian, allergies" },
+      { t: "Révision semaine 3", g: "review + mini-test: order at a café, buy groceries, talk about food you like", review: true },
+    ],
+  },
+  {
+    theme: "Se déplacer en ville",
+    days: [
+      { t: "Demander son chemin", g: "où est… ?, à gauche, à droite, tout droit, à côté de, en face de" },
+      { t: "Aller et venir", g: "aller and venir in present, au/à la/aux, je vais à la fac" },
+      { t: "Les transports", g: "métro, RER, bus, tram, un ticket, un pass Navigo / carte de transport, la ligne, la direction, changer à" },
+      { t: "Dire l'heure", g: "quelle heure est-il ?, et quart, et demie, moins le quart, 24-hour time (14h30)" },
+      { t: "Le futur proche", g: "aller + infinitive: je vais prendre le métro, plans for tomorrow" },
+      { t: "Comprendre les annonces", g: "station/train announcements, en raison de, retard, voie, prochain arrêt, listening to fast speech" },
+      { t: "Révision semaine 4", g: "review + mini-test: ask the way, buy a ticket, plan your day with times", review: true },
+    ],
+  },
+  {
+    theme: "Le logement",
+    days: [
+      { t: "Décrire un logement", g: "un studio, une chambre, une colocation, la cuisine, la salle de bains, meublé, il y a" },
+      { t: "Les adjectifs", g: "adjective agreement and position (grand, petit, beau, cher, calme, lumineux)" },
+      { t: "La négation", g: "ne…pas, ne…plus, ne…jamais, il n'y a pas de; spoken French drops 'ne'" },
+      { t: "Visiter un appartement", g: "le loyer, les charges comprises, la caution, le garant, l'état des lieux, disponible quand ?" },
+      { t: "Le verbe faire", g: "faire in present, faire les courses / le ménage / la cuisine / la lessive" },
+      { t: "Les aides au logement", g: "la CAF, les APL, un dossier, une attestation, the Crous residence" },
+      { t: "Révision semaine 5", g: "review + mini-test: describe your ideal flat and ask a landlord 5 questions", review: true },
+    ],
+  },
+  {
+    theme: "Démarches et banque",
+    days: [
+      { t: "Pouvoir, vouloir, devoir", g: "present of pouvoir/vouloir/devoir, je peux… ?, je dois…, je voudrais (polite)" },
+      { t: "Ouvrir un compte bancaire", g: "un compte, un RIB, une carte bancaire, un justificatif de domicile, une pièce d'identité" },
+      { t: "Remplir un formulaire", g: "nom, prénom, date de naissance, adresse, code postal, signature, cocher la case" },
+      { t: "Le titre de séjour", g: "visa VLS-TS, validation en ligne, l'OFII, un rendez-vous, un récépissé, la préfecture" },
+      { t: "Au téléphone", g: "allô, c'est de la part de qui ?, je vous appelle pour…, pouvez-vous parler plus lentement ?" },
+      { t: "Un forfait mobile", g: "une carte SIM, un forfait, sans engagement, les gigas, la box internet" },
+      { t: "Révision semaine 6", g: "review + mini-test: phone call to make an appointment and open a bank account", review: true },
+    ],
+  },
+  {
+    theme: "La vie à l'université",
+    days: [
+      { t: "Mes études", g: "j'étudie…, je suis en licence/master, la filière, les matières, field-specific vocabulary" },
+      { t: "Les verbes en -ir et -re", g: "finir, choisir, prendre, comprendre, apprendre, attendre in present" },
+      { t: "Ma routine (verbes pronominaux)", g: "se lever, se réveiller, s'habiller, se coucher, daily routine" },
+      { t: "L'emploi du temps", g: "le CM, le TD, le TP, l'amphi, la salle, un partiel, le contrôle continu, l'ENT" },
+      { t: "L'inscription à la fac", g: "l'inscription administrative / pédagogique, la scolarité, la carte étudiante, la CVEC" },
+      { t: "Écrire un e-mail simple", g: "Bonjour Madame/Monsieur, je me permets de vous écrire…, cordialement; email to the secrétariat" },
+      { t: "Révision semaine 7", g: "review + mini-test: describe your studies, timetable and daily routine", review: true },
+    ],
+  },
+  {
+    theme: "Raconter le passé",
+    days: [
+      { t: "Le passé composé avec avoir", g: "j'ai mangé, j'ai fini, j'ai pris; past participles of common verbs" },
+      { t: "Le passé composé avec être", g: "aller, venir, partir, arriver, rester, naître… agreement (je suis allée)" },
+      { t: "Raconter son week-end", g: "time markers: hier, le week-end dernier, d'abord, ensuite, après, enfin" },
+      { t: "Participes irréguliers", g: "fait, eu, été, vu, dit, pu, voulu, dû, mis, lu" },
+      { t: "La négation au passé", g: "je n'ai pas compris, je ne suis jamais allé(e)…, déjà / pas encore" },
+      { t: "Raconter un problème", g: "j'ai perdu…, on m'a volé…, ma carte a été bloquée — telling what happened" },
+      { t: "Révision semaine 8", g: "review + mini-test: tell the story of your last trip or weekend", review: true },
+    ],
+  },
+  {
+    theme: "Santé et services",
+    days: [
+      { t: "Le corps et les symptômes", g: "j'ai mal à la tête / au ventre / à la gorge, j'ai de la fièvre, je tousse" },
+      { t: "Chez le médecin", g: "prendre rendez-vous (Doctolib), le médecin traitant, une ordonnance, depuis quand ?" },
+      { t: "À la pharmacie", g: "un médicament, sans ordonnance, un comprimé, deux fois par jour, les conseils du pharmacien" },
+      { t: "La sécurité sociale", g: "la carte Vitale, la mutuelle, être remboursé, l'Assurance Maladie, ameli" },
+      { t: "Il faut et l'impératif", g: "il faut + infinitive, imperative (prenez, reposez-vous, n'oubliez pas)" },
+      { t: "Les urgences", g: "le 15 / le 112, c'est urgent, appelez…, au secours, emergency phrases" },
+      { t: "Révision semaine 9", g: "review + mini-test: describe symptoms to a doctor and understand instructions", review: true },
+    ],
+  },
+  {
+    theme: "Vie sociale",
+    days: [
+      { t: "Se faire des amis", g: "small talk with classmates, tu fais quoi ce week-end ?, on échange nos numéros ?" },
+      { t: "Inviter, accepter, refuser", g: "ça te dit de… ?, avec plaisir, désolé(e), je ne peux pas, une autre fois" },
+      { t: "Donner son avis", g: "je pense que, je trouve que, à mon avis, je suis d'accord / pas d'accord" },
+      { t: "Comparer", g: "plus…que, moins…que, aussi…que, meilleur, le plus" },
+      { t: "Les pronoms le, la, les, lui, leur", g: "direct and indirect object pronouns in present and passé composé" },
+      { t: "Le français parlé", g: "on = nous, ouais, du coup, genre, trop bien, c'est relou, dropped 'ne', verlan basics" },
+      { t: "Révision semaine 10", g: "review + mini-test: invite a friend, discuss opinions about a film or city", review: true },
+    ],
+  },
+  {
+    theme: "Le français académique",
+    days: [
+      { t: "Comprendre un cours magistral", g: "lecture structure signals: tout d'abord, ensuite, en effet, par conséquent, en résumé" },
+      { t: "L'imparfait", g: "formation and uses: descriptions and habits in the past (quand j'étais petit…)" },
+      { t: "Imparfait ou passé composé ?", g: "background vs event: il pleuvait quand je suis arrivé(e)" },
+      { t: "Prendre des notes", g: "abbreviations (cad, pb, qqch, ds, ex, cf.), symbols, structuring notes" },
+      { t: "Participer en classe", g: "Pourriez-vous répéter ?, J'ai une question, Qu'entendez-vous par… ?, travail de groupe" },
+      { t: "Écrire à un professeur", g: "formal email: objet, Madame la Professeure, je vous serais reconnaissant(e)…, formules de politesse" },
+      { t: "Révision semaine 11", g: "review + mini-test: summarise a short lecture extract and write a formal email", review: true },
+    ],
+  },
+  {
+    theme: "Prêt(e) pour la France !",
+    days: [
+      { t: "Le futur simple", g: "je serai, j'aurai, j'irai, je ferai; plans for the year in France" },
+      { t: "Le conditionnel de politesse", g: "je voudrais, pourriez-vous, j'aimerais, ce serait possible de… ?" },
+      { t: "Faire un exposé", g: "structuring a short presentation: introduction, plan, transitions, conclusion" },
+      { t: "Exprimer cause et conséquence", g: "parce que, car, comme, donc, alors, c'est pourquoi" },
+      { t: "Simulation : la première semaine", g: "full scenario chain: arrival, transport, flat, bank, university desk" },
+      { t: "Bilan et plan de suite", g: "self-assessment against A2/B1, personal weak points, plan for continuing in France" },
+      { t: "Révision finale", g: "final mixed test covering all 12 weeks, with a level estimate", review: true },
+    ],
+  },
+];
+
+const TOTAL_DAYS = WEEKS.length * 7;
+
+function lessonFor(day) {
+  const d = Math.min(Math.max(1, day), TOTAL_DAYS);
+  const week = Math.ceil(d / 7);
+  const w = WEEKS[week - 1];
+  const lesson = w.days[(d - 1) % 7];
+  return { day: d, week, theme: w.theme, ...lesson };
+}
+
+function levelFor(day) {
+  if (day <= 14) return "A0→A1 (complete beginner)";
+  if (day <= 35) return "A1";
+  if (day <= 56) return "A1+/A2";
+  return "A2→B1";
+}
+
+const SCENARIOS = [
+  { id: "aeroport", emoji: "✈️", title: "Arrivée à l'aéroport", en: "Get from the airport to your address", role: "an information-desk agent at Paris-Charles-de-Gaulle airport", goal: "find out how to get to their address in the city, buy the right ticket, and understand which line/platform to take" },
+  { id: "boulangerie", emoji: "🥖", title: "À la boulangerie", en: "Buy bread and pastries", role: "a friendly but busy boulangère with a queue behind the learner", goal: "order bread and pastries, ask a price, and pay" },
+  { id: "cafe", emoji: "☕", title: "Au café", en: "Order and pay at a café", role: "a Parisian café waiter (efficient, a little brisk)", goal: "get a table, order a drink and something to eat, and ask for the bill" },
+  { id: "logement", emoji: "🏠", title: "Visite d'un appartement", en: "Visit a flat for rent", role: "a landlord showing a small furnished studio near the university", goal: "ask about the rent, charges, deposit, guarantor, availability and whether it is eligible for CAF housing aid" },
+  { id: "banque", emoji: "🏦", title: "Ouvrir un compte bancaire", en: "Open a bank account", role: "a bank advisor (conseiller/conseillère) in a high-street bank", goal: "open a student account, understand which documents are needed, and get a RIB and a bank card" },
+  { id: "telephone", emoji: "📱", title: "Acheter un forfait mobile", en: "Get a phone plan", role: "a salesperson in a phone shop", goal: "choose a SIM-only plan with no commitment and understand the price and data" },
+  { id: "titre", emoji: "🛂", title: "Le titre de séjour", en: "Residence permit questions", role: "an agent at the international students' welcome desk who helps with the VLS-TS visa validation and OFII", goal: "understand the steps to validate their student visa and what documents to prepare" },
+  { id: "caf", emoji: "📄", title: "Demande d'aide au logement (CAF)", en: "Apply for housing aid", role: "a CAF advisor on the phone", goal: "find out whether they are eligible for APL and which documents to send" },
+  { id: "inscription", emoji: "🎓", title: "Inscription à la fac", en: "Register at the university", role: "a staff member at the university's scolarité office", goal: "complete registration, get their student card, and understand their timetable and where to find it" },
+  { id: "camarades", emoji: "👋", title: "Rencontrer des camarades", en: "Meet classmates on day one", role: "a friendly French student sitting next to the learner before the first lecture", goal: "introduce themselves, make small talk, and exchange contacts" },
+  { id: "prof", emoji: "👩‍🏫", title: "Parler à un professeur", en: "Talk to a professor after class", role: "a university professor, polite and formal (uses vous)", goal: "ask a question about the lecture, an assignment deadline, and office hours" },
+  { id: "groupe", emoji: "🧑‍🤝‍🧑", title: "Travail de groupe", en: "Organise a group project", role: "a classmate in a TD group project", goal: "agree on who does what, set a meeting time and place, and exchange contacts" },
+  { id: "medecin", emoji: "🩺", title: "Chez le médecin", en: "See a doctor", role: "a general practitioner (médecin généraliste)", goal: "explain their symptoms, answer the doctor's questions, and understand the prescription" },
+  { id: "pharmacie", emoji: "💊", title: "À la pharmacie", en: "Get something at the pharmacy", role: "a pharmacist", goal: "describe a minor problem, get a medicine without prescription, and understand the dosage" },
+  { id: "supermarche", emoji: "🛒", title: "Au supermarché", en: "Shopping and finding things", role: "a supermarket employee stacking shelves, then a cashier", goal: "find three items, ask about a promotion, and pay at the till" },
+  { id: "train", emoji: "🚆", title: "Acheter un billet de train", en: "Buy a train ticket", role: "an SNCF ticket-office agent", goal: "buy a return ticket for the weekend, ask about a youth discount card, and find the platform" },
+  { id: "fuite", emoji: "🚿", title: "Un problème dans l'appart", en: "Report a leak to your landlord", role: "the learner's landlord answering the phone (a bit annoyed at first)", goal: "explain the problem, describe it, and agree on when someone will come to fix it" },
+  { id: "soiree", emoji: "🎉", title: "Une soirée étudiante", en: "Chat at a student party", role: "a talkative French student at a party, using casual spoken French", goal: "chat about studies, hometowns and plans, and accept an invitation for later in the week" },
+];
+
+// ---- prompts.js ----
+
+
+const clip = (s, n) => String(s ?? "").slice(0, n).trim();
+
+const CORE = `You are Camille, a warm, patient and lively French tutor from Lyon who now lives in Paris. Your student is preparing to study at a French university in about three months and is close to a complete beginner. Every session is a short (about 30 minutes a day) but effective chat with them.
+
+# How you teach
+- Immersion first: write in French, adapted to the student's level. At A0-A1 that means very short sentences, high-frequency words, the present tense, and lots of repetition of words they have already met. Raise the level gradually as they show they can cope.
+- Use English only as a safety net: when they write "?", "help", "je ne comprends pas" or ask in English, when they are clearly lost, or for one-line grammar notes. Then go straight back to French.
+- The student should produce more language than you. Keep your turns short (usually under 70 words, excluding vocabulary lists), do one thing at a time, and end every message with exactly one clear question or task for them.
+- Use realistic situations from student life in France (the fac, the Crous, the CAF, the bank, the métro, flatmates, classmates) and recycle useful chunks ("Je voudrais…", "Est-ce que je peux…", "Vous pouvez répéter ?").
+- Teach spoken French as it really sounds. Briefly flag pronunciation traps (silent letters, liaisons, nasal vowels, u vs ou, the French r) when they come up.
+- Add a short culture tip from time to time (vous vs tu, la bise, how French admin works, student life).
+- Be encouraging and specific. Praise real progress, not every message.
+
+# Corrections
+When the student writes French that contains mistakes, start your reply with correction lines, one per mistake, at most the 2 most important ones (mention any other small slips in a few words). Use exactly this format on its own line:
+✏️ ~~what they wrote~~ → **correct version** — very short reason (English is fine here)
+Then carry on naturally. Never correct typos with missing accents more than once per session; just model the right spelling. If their French is correct, do not invent corrections.
+
+# Formatting (the app renders these)
+- Glosses: wrap every French word or phrase the student probably doesn't know yet in double brackets with an English translation: [[le loyer|the rent]], [[Je voudrais|I would like]]. Gloss generously at the start, less as the level rises. Don't gloss obvious cognates or words you glossed recently.
+- Listening: put French meant to be heard (and not read first) inside [ecoute]…[/ecoute]. The app turns it into an audio player with a hidden transcript. Don't use glosses inside these blocks. Write it as natural speech.
+- Memory: when you notice something worth remembering across sessions (a recurring mistake, a strength, their field of study, interests, their city), write one line [note]…[/note] in English, under 15 words. At most one per message, and only when it's genuinely useful. The student doesn't see it.
+- Use simple markdown: **bold**, *italics*, short "- " lists. No tables, no headings bigger than ###.
+- Answer immediately and concisely. This is a live chat.`;
+
+function learnerSection(ctx) {
+  const p = ctx.profile || {};
+  const lines = [];
+  if (p.name) lines.push(`Name: ${clip(p.name, 60)}`);
+  if (p.native) lines.push(`Native/other languages: ${clip(p.native, 120)} (use contrasts with these when helpful)`);
+  if (p.destination) lines.push(`Going to: ${clip(p.destination, 160)}`);
+  if (p.field) lines.push(`Field of study: ${clip(p.field, 120)}`);
+  if (ctx.daysLeft != null) lines.push(`Days until departure: ${Number(ctx.daysLeft) | 0}`);
+  lines.push(`Current course level: ${levelFor(Number(ctx.lessonDay) || 1)} (lesson day ${Number(ctx.lessonDay) || 1} of 84)`);
+  if (ctx.wordsKnown) lines.push(`Words in their flashcard deck: ${Number(ctx.wordsKnown) | 0}`);
+  const notes = (Array.isArray(ctx.notes) ? ctx.notes : []).slice(-30).map((n) => `- ${clip(n, 160)}`);
+  let out = `# About the student\n${lines.join("\n")}`;
+  if (notes.length) out += `\n\nYour notes from earlier sessions:\n${notes.join("\n")}`;
+  const due = (Array.isArray(ctx.dueWords) ? ctx.dueWords : []).slice(0, 12).map((w) => clip(w, 80));
+  if (due.length) out += `\n\nWords due for review in their deck (weave some of these in naturally): ${due.join(", ")}`;
+  return out;
+}
+
+function modeSection(ctx) {
+  switch (ctx.mode) {
+    case "lesson": {
+      const l = lessonFor(Number(ctx.lessonDay) || 1);
+      if (l.review) {
+        return `# Today's session: weekly review (day ${l.day}, week ${l.week}: "${l.theme}")
+Focus: ${l.g}
+Run a friendly review in steps, one step per message, waiting for the student each time:
+1. Quick warm-up chat using this week's language.
+2. A mini-test of 10 short items, ONE item per message (mix comprehension, translation into French, fill-in-the-blank, and one [ecoute] item). Keep score.
+3. A short role-play that uses the week's language.
+4. Results: score out of 10, 2 strengths, 2 things to work on (write a [note] about the main weakness), and tell them they can press "Leçon terminée" to unlock next week.
+Start by greeting them by name and launching step 1.`;
+      }
+      return `# Today's lesson (day ${l.day}, week ${l.week}: "${l.theme}")
+Lesson title: ${l.t}
+Goals: ${l.g}
+Teach this as a ~20-minute interactive lesson in steps, ONE step per message, always waiting for the student's answer before moving on:
+1. Warm-up: 2 quick questions recycling earlier material or the review words.
+2. Key phrases: present 6–10 useful chunks for today's goal as a "- " list, every item glossed, with one pronunciation tip.
+3. Model dialogue: a short realistic dialogue (6–8 lines) set in the student's future life in France, inside [ecoute]…[/ecoute], then ask one comprehension question.
+4. Grammar in a nutshell: explain the one key pattern in 3–4 lines (English allowed for the rule, French examples).
+5. Practice: 4–5 short exercises, ONE per message (fill the gap, translate into French, answer a question, reorder words), with feedback each time.
+6. Free practice: a mini role-play where they must use the new chunks.
+7. Wrap-up: the 3 most useful takeaways and an encouraging comment, then tell them to press "Leçon terminée" (and to add the new words to their flashcards with the ➕ buttons).
+Start now: greet them by name, say today's objective in one simple glossed French sentence, and do step 1.`;
+    }
+    case "situation": {
+      const s = SCENARIOS.find((x) => x.id === ctx.scenarioId) || SCENARIOS[0];
+      return `# Role-play: ${s.title}
+You play: ${s.role}.
+The student's goal: ${s.goal}.
+- Open with one line in *italics* setting the scene in simple French (glossed), then speak your first line in character.
+- Stay in character. Speak naturally but adapted to their level, as a real person in France would (polite "vous" unless the setting is casual among students).
+- Put any ✏️ corrections at the top of your reply, then continue in character.
+- If they seem stuck, add a line "💡 Tu peux dire : …" with 1–2 phrases they could use.
+- Add small realistic complications sometimes (a missing document, a question they didn't expect).
+- When the goal is reached (or after about 12 exchanges), step out of the role with "— Fin de la scène —" and give a short debrief: what went well, 3 phrases to remember (glossed), and a mark out of 10.`;
+    }
+    case "listening":
+      return `# Listening practice (écoute)
+Train their ear for real spoken French. Loop:
+1. Give one short audio text in [ecoute]…[/ecoute]. At A0-A1, 2–4 slow, simple sentences (30–50 words). Later, longer and more natural (fillers like "ben", "euh", "du coup", dropped "ne", numbers, times, prices). Vary the genre: a voicemail from a landlord, a métro or station announcement, a professor announcing an exam, a classmate's voice message, a radio weather forecast, a shop conversation.
+2. Then give the task in French: 2–3 simple comprehension questions, OR a dictation ("Écris ce que tu entends"), OR true/false, OR "note the number/time/price you hear". Never reveal the transcript content outside the [ecoute] block before they answer.
+3. After they answer, correct them, point out exactly which sounds or words they missed and why (liaison, elision, silent letters), then offer the next audio, a little harder if they did well.
+Start with a one-line welcome and the first audio.`;
+    case "academic":
+      return `# Academic French
+Prepare them for French university: following lectures (CM), TDs, reading short academic texts, note-taking, participating in class, and writing formal emails to professors and the scolarité. Adapt the content to their field of study.
+Start with a short welcome and offer a numbered menu of 4 activities, for example: 1) understand a mini-lecture extract (as [ecoute]) and take notes, 2) write an email to a professor or the secretary's office together, 3) learn key university vocabulary (CM, TD, partiel, UE, ECTS, ENT, emploi du temps…), 4) practise asking questions in class. Keep the level accessible: simplify the texts to their level but keep authentic academic structures. When writing emails, have the student draft first, then correct and give an improved model.`;
+    default:
+      return `# Free conversation
+Have a relaxed conversation in French about anything: their life, their plans in France, their studies, food, films, travel, the news in simple terms. Bring up topics yourself when needed, related to what you know about them. Keep it a real conversation: react, share a little about "yourself" as Camille, ask follow-up questions.
+Start with a short, friendly opening question.`;
+  }
+}
+
+function buildSystemPrompt(ctx = {}) {
+  return `${CORE}\n\n${learnerSection(ctx)}\n\n${modeSection(ctx)}`;
+}
+
+// ---- app.js ----
+
+
+
+// ---------- State ----------
+const STORE_KEY = "camille.v1";
+const DAY_MS = 86_400_000;
+
+const defaultState = () => ({
+  profile: { name: "", native: "", destination: "", field: "", departure: isoDate(Date.now() + 90 * DAY_MS) },
+  progress: { lessonDay: 1, completed: {}, streak: { count: 0, last: null }, activity: {} },
+  notes: [],
+  cards: [],
+  chats: {},
+  settings: { autoSpeak: false, rate: 0.9, voice: "" },
+  onboarded: false,
+});
+
+// Progress, notes and flashcards are saved to the viewer's Claude account (db
+// capability, private per person) so they follow them across devices. The browser
+// keeps a cache, and also the chats, which are a convenience.
+const CHATS_KEY = "camille.chats.v1";
+let state = loadLocal();
+const remote = { main: null, cards: null, written: {}, timer: null, writing: false };
+
+function loadLocal() {
+  const s = defaultState();
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) deepMerge(s, JSON.parse(raw));
+    const chats = localStorage.getItem(CHATS_KEY);
+    if (chats) s.chats = JSON.parse(chats);
+  } catch {}
+  return s;
+}
+const mainDoc = () => {
+  const { profile, progress, notes, settings, onboarded } = state;
+  return { profile, progress, notes, settings, onboarded };
+};
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({ ...mainDoc(), cards: state.cards }));
+    localStorage.setItem(CHATS_KEY, JSON.stringify(state.chats));
+  } catch {}
+  if (remote.main) {
+    clearTimeout(remote.timer);
+    remote.timer = setTimeout(flushRemote, 1200);
+  }
+}
+async function flushRemote() {
+  if (remote.writing) {
+    remote.timer = setTimeout(flushRemote, 600);
+    return;
+  }
+  remote.writing = true;
+  try {
+    for (const [key, ref, body] of [
+      ["main", remote.main, mainDoc()],
+      ["cards", remote.cards, { list: state.cards }],
+    ]) {
+      const json = JSON.stringify(body);
+      if (remote.written[key] === json) continue;
+      await ref.set(JSON.parse(json));
+      remote.written[key] = json;
+    }
+  } catch (e) {
+    if (e?.code === "quota_exceeded") toast("⚠️ Storage full: delete some flashcards");
+    else if (e?.code === "unavailable") remote.timer = setTimeout(flushRemote, 3000 + Math.random() * 2000);
+  } finally {
+    remote.writing = false;
+  }
+}
+async function initAccountStorage() {
+  try {
+    const [db, user] = await Promise.all([window.claude?.use("db"), window.claude?.use("user")]);
+    const uid = db && user ? await user.id() : null;
+    if (!uid) return false;
+    const mainRef = db.doc(`data/users/${uid}/main`);
+    const cardsRef = db.doc(`data/users/${uid}/cards`);
+    const [m, c] = await Promise.all([mainRef.get(), cardsRef.get()]);
+    if (m.exists) {
+      const chats = state.chats;
+      state = deepMerge(defaultState(), structuredClone(m.data()));
+      state.chats = chats;
+      state.cards = c.exists && Array.isArray(c.data().list) ? structuredClone(c.data().list) : [];
+      remote.written.main = JSON.stringify(mainDoc());
+      remote.written.cards = JSON.stringify({ list: state.cards });
+    }
+    remote.main = mainRef;
+    remote.cards = cardsRef;
+    save(); // first visit on this account: uploads what this browser had
+    return true;
+  } catch {
+    return false;
+  }
+}
+function deepMerge(base, extra) {
+  for (const [k, v] of Object.entries(extra || {})) {
+    base[k] = v && typeof v === "object" && !Array.isArray(v) && base[k] && typeof base[k] === "object" && !Array.isArray(base[k])
+      ? deepMerge(base[k], v)
+      : v;
+  }
+  return base;
+}
+
+function isoDate(ms = Date.now()) {
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+const today = () => isoDate();
+function todayActivity() {
+  return (state.progress.activity[today()] ||= { lesson: false, cards: 0, practice: false });
+}
+function markActive(kind) {
+  const a = todayActivity();
+  if (kind === "cards") a.cards++;
+  else if (kind) a[kind] = true;
+  const s = state.progress.streak;
+  if (s.last !== today()) {
+    s.count = s.last === isoDate(Date.now() - DAY_MS) ? s.count + 1 : 1;
+    s.last = today();
+  }
+  save();
+}
+function daysLeft() {
+  if (!state.profile.departure) return null;
+  const dep = new Date(state.profile.departure + "T00:00:00");
+  return Math.ceil((dep - new Date(today() + "T00:00:00")) / DAY_MS);
+}
+
+// ---------- Helpers ----------
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (t.hidden = true), 2600);
+}
+
+// ---------- Speech (text-to-speech) ----------
+let voices = [];
+function loadVoices() {
+  voices = (window.speechSynthesis?.getVoices() || []).filter((v) => v.lang?.toLowerCase().startsWith("fr"));
+  voices.sort((a, b) => score(b) - score(a));
+  function score(v) {
+    let s = 0;
+    if (/fr[-_]FR/i.test(v.lang)) s += 4;
+    if (/google|natural|premium|enhanced|neural|amélie|thomas|audrey|aurélie|denise|henri/i.test(v.name)) s += 2;
+    if (v.localService) s += 1;
+    return s;
+  }
+  const sel = $("#voice-select");
+  if (sel) {
+    sel.innerHTML = voices.length
+      ? voices.map((v) => `<option value="${esc(v.name)}">${esc(v.name)} (${esc(v.lang)})</option>`).join("")
+      : `<option value="">No French voice found on this device</option>`;
+    sel.value = state.settings.voice || voices[0]?.name || "";
+  }
+}
+if ("speechSynthesis" in window) {
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+function speak(text, rate = state.settings.rate) {
+  if (!("speechSynthesis" in window) || !text.trim()) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "fr-FR";
+  u.rate = rate;
+  const v = voices.find((x) => x.name === state.settings.voice) || voices[0];
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+// Text to read aloud: drop corrections, notes and gloss translations.
+function speakable(text) {
+  return text
+    .replace(/\[note\][\s\S]*?(\[\/note\]|$)/g, "")
+    .replace(/^✏️.*$/gm, "")
+    .replace(/\[\[([^\]|]+)\|[^\]]*\]\]/g, "$1")
+    .replace(/\[\/?ecoute\]/g, "\n")
+    .replace(/[*_~`#>]/g, "")
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "")
+    .trim();
+}
+
+// ---------- Confirm (the artifact viewer blocks window.confirm) ----------
+function askConfirm(message, okLabel = "Oui") {
+  const dlg = $("#confirm");
+  $("#confirm-text").textContent = message;
+  $("#confirm-ok").textContent = okLabel;
+  dlg.showModal();
+  return new Promise((resolve) => {
+    dlg.onclose = () => resolve(dlg.returnValue === "ok");
+  });
+}
+
+// ---------- Tutor text rendering ----------
+function inline(s) {
+  return s
+    .replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, (_, fr, en) => {
+      const saved = hasCard(unesc(fr)) ? " saved" : "";
+      return `<span class="gloss${saved}" data-fr="${fr}" data-en="${en}">${fr}</span>`;
+    })
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>")
+    .replace(/~~([^~]+)~~/g, "<del>$1</del>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+}
+function unesc(s) {
+  const t = document.createElement("textarea");
+  t.innerHTML = s;
+  return t.value;
+}
+
+function renderTutor(raw, streaming = false) {
+  let text = raw.replace(/\[note\][\s\S]*?\[\/note\]/g, "");
+  if (streaming) {
+    // Hide markup that hasn't been closed yet.
+    text = text.replace(/\[note\][\s\S]*$/, "").replace(/\[\[[^\]]*\]?$/, "");
+  }
+  const audios = [];
+  text = text.replace(/\[ecoute\]([\s\S]*?)\[\/ecoute\]/g, (_, a) => {
+    audios.push(a.trim());
+    return `\n@@AUDIO${audios.length - 1}@@\n`;
+  });
+  if (/\[ecoute\]/.test(text)) text = text.replace(/\[ecoute\][\s\S]*$/, "\n@@PENDING@@\n");
+
+  const lines = esc(text).split("\n");
+  let html = "";
+  let para = [];
+  let list = null;
+  const flushPara = () => {
+    if (para.length) html += `<p>${para.map(inline).join("<br>")}</p>`;
+    para = [];
+  };
+  const flushList = () => {
+    if (list) html += `<${list.tag}>${list.items.map((i) => `<li>${inline(i)}</li>`).join("")}</${list.tag}>`;
+    list = null;
+  };
+  for (const line of lines) {
+    const t = line.trim();
+    let m;
+    if (!t) {
+      flushPara();
+      flushList();
+    } else if ((m = t.match(/^@@AUDIO(\d+)@@$/))) {
+      flushPara();
+      flushList();
+      const a = audios[+m[1]];
+      html += `<div class="ecoute" data-audio="${esc(a)}"><button data-act="play">▶ Écouter</button><button data-act="slow">🐢 Lentement</button><button data-act="reveal">Voir le texte</button><div class="transcript" hidden>${esc(a)}</div></div>`;
+    } else if (t === "@@PENDING@@") {
+      flushPara();
+      flushList();
+      html += `<div class="ecoute pending">Préparation de l'audio…</div>`;
+    } else if (t.startsWith("✏️")) {
+      flushPara();
+      flushList();
+      html += `<div class="correction">${inline(t)}</div>`;
+    } else if (t.startsWith("💡")) {
+      flushPara();
+      flushList();
+      html += `<div class="hint">${inline(t)}</div>`;
+    } else if ((m = t.match(/^#{1,4}\s+(.*)/))) {
+      flushPara();
+      flushList();
+      html += `<h4>${inline(m[1])}</h4>`;
+    } else if ((m = t.match(/^[-•]\s+(.*)/)) || (m = t.match(/^\d+[.)]\s+(.*)/))) {
+      flushPara();
+      const tag = /^\d/.test(t) ? "ol" : "ul";
+      if (list && list.tag !== tag) flushList();
+      list ||= { tag, items: [] };
+      list.items.push(m[1]);
+    } else {
+      flushList();
+      para.push(t);
+    }
+  }
+  flushPara();
+  flushList();
+  return html;
+}
+
+function glossesIn(raw) {
+  const out = [];
+  for (const m of raw.matchAll(/\[\[([^\]|]+)\|([^\]]+)\]\]/g)) out.push({ fr: m[1].trim(), en: m[2].trim() });
+  return out;
+}
+const textOf = (content) =>
+  typeof content === "string" ? content : content.filter((b) => b.type === "text").map((b) => b.text).join("");
+
+// ---------- Flashcards (spaced repetition, SM-2 style) ----------
+const norm = (s) => s.toLowerCase().normalize("NFC").replace(/\s+/g, " ").trim();
+function hasCard(fr) {
+  const n = norm(fr);
+  return state.cards.some((c) => norm(c.fr) === n);
+}
+function addCard(fr, en, quiet = false) {
+  if (!fr || !en || hasCard(fr)) return false;
+  state.cards.push({ id: crypto.randomUUID?.() || String(Math.random()), fr, en, due: Date.now(), interval: 0, ease: 2.5, reps: 0, lapses: 0, created: Date.now() });
+  save();
+  if (!quiet) toast(`➕ « ${fr} » ajouté à tes cartes`);
+  return true;
+}
+const dueCards = () => state.cards.filter((c) => c.due <= Date.now()).sort((a, b) => a.due - b.due);
+
+// Returns the card's next scheduling fields for grade g (0 again, 1 hard, 2 good, 3 easy).
+function schedule(card, g, now = Date.now()) {
+  if (g === 0) {
+    return { reps: 0, lapses: card.lapses + 1, interval: 0, ease: Math.max(1.3, card.ease - 0.2), due: now + 60_000 };
+  }
+  let { interval, ease } = card;
+  if (g === 1) {
+    interval = card.reps === 0 ? 1 : Math.max(1, interval * 1.2);
+    ease = Math.max(1.3, ease - 0.15);
+  } else if (g === 2) {
+    interval = card.reps === 0 ? 1 : card.reps === 1 ? 3 : interval * ease;
+  } else {
+    interval = card.reps === 0 ? 4 : Math.max(4, interval * ease * 1.3);
+    ease += 0.15;
+  }
+  return { reps: card.reps + 1, lapses: card.lapses, interval, ease, due: now + interval * DAY_MS };
+}
+function grade(card, g) {
+  Object.assign(card, schedule(card, g));
+  markActive("cards");
+}
+function nextIntervalLabel(card, g) {
+  if (g === 0) return "1 min";
+  const d = Math.round(schedule(card, g).interval);
+  return d < 30 ? `${d} j` : `${Math.round(d / 30)} mois`;
+}
+
+// ---------- Views ----------
+const VIEWS = ["home", "situations", "course", "chat", "cards"];
+let currentChatKey = null;
+
+function go(view) {
+  if (view !== "chat") {
+    replyCtl?.abort();
+    speechSynthesis?.cancel();
+    currentChatKey = null;
+  }
+  for (const v of VIEWS) $(`#view-${v}`).hidden = v !== view;
+  hidePopover();
+  if (view === "home") renderHome();
+  if (view === "situations") renderSituations();
+  if (view === "course") renderCourse();
+  if (view === "cards") renderCards();
+  window.scrollTo(0, 0);
+}
+
+function renderStats() {
+  const dl = daysLeft();
+  $("#stat-countdown").textContent = dl == null ? "" : dl > 0 ? `✈️ J-${dl}` : "🇫🇷 En France !";
+  const s = state.progress.streak;
+  const alive = s.last === today() || s.last === isoDate(Date.now() - DAY_MS);
+  $("#stat-streak").textContent = `🔥 ${alive ? s.count : 0}`;
+}
+
+function renderHome() {
+  renderStats();
+  const name = state.profile.name;
+  const h = new Date().getHours();
+  $("#hello").textContent = `${h >= 18 ? "Bonsoir" : "Bonjour"}${name ? ", " + name : ""} !`;
+
+  const a = todayActivity();
+  const due = dueCards().length;
+  const cardsDone = a.cards >= 10 || (due === 0 && state.cards.length > 0);
+  const l = lessonFor(state.progress.lessonDay);
+  const plan = [
+    { done: cardsDone, title: "Révise tes cartes", sub: !state.cards.length ? "Paquet vide pour l'instant" : due ? `${due} à revoir · 5 min` : "Rien à revoir · 5 min", go: "cards" },
+    { done: a.lesson, title: `Leçon : ${l.t}`, sub: "20 min", lesson: true },
+    { done: a.practice, title: "Écoute ou situation", sub: "5 min", go: a.lesson ? "situations" : "listening" },
+  ];
+  $("#today-plan").innerHTML = plan
+    .map((p, i) => `<li data-i="${i}" class="${p.done ? "done" : ""}"><span class="check">${p.done ? "✓" : i + 1}</span><b>${esc(p.title)}</b><small>${esc(p.sub)}</small></li>`)
+    .join("");
+  $("#today-plan").onclick = (e) => {
+    const li = e.target.closest("li");
+    if (!li) return;
+    const p = plan[+li.dataset.i];
+    if (p.lesson) startLesson();
+    else if (p.go === "listening") startMode("listening");
+    else go(p.go);
+  };
+
+  $("#lesson-eyebrow").textContent = `Semaine ${l.week} · Jour ${((l.day - 1) % 7) + 1} — ${l.theme}`;
+  $("#lesson-title").textContent = l.t;
+  $("#lesson-goals").textContent = l.g;
+  const done = Object.keys(state.progress.completed).length;
+  $("#course-bar").style.width = `${(Math.min(done, TOTAL_DAYS) / TOTAL_DAYS) * 100}%`;
+  $("#course-label").textContent = `${done}/${TOTAL_DAYS} leçons · niveau visé : ${levelFor(l.day)}`;
+  const inProgress = state.chats.lesson?.context?.lessonDay === l.day && state.chats.lesson.messages.length > 1;
+  $("#btn-lesson").textContent = a.lesson && !inProgress ? "Refaire / continuer demain" : inProgress ? "Reprendre la leçon" : "Commencer la leçon";
+  $("#tile-cards").textContent = state.cards.length ? `${state.cards.length} mots · ${due} à revoir` : "Spaced repetition";
+}
+
+function renderSituations() {
+  $("#scenario-grid").innerHTML = SCENARIOS.map(
+    (s) => `<button class="tile" data-scenario="${s.id}"><span>${s.emoji}</span><b>${esc(s.title)}</b><small>${esc(s.en)}</small></button>`,
+  ).join("");
+}
+
+function renderCourse() {
+  const cur = state.progress.lessonDay;
+  $("#course-list").innerHTML = WEEKS.map((w, wi) => {
+    const days = w.days
+      .map((d, di) => {
+        const n = wi * 7 + di + 1;
+        const cls = [state.progress.completed[n] ? "done" : "", n === cur ? "current" : ""].join(" ");
+        return `<button class="day ${cls}" data-day="${n}"><span class="n">J${n}</span><span>${d.review ? "⭐ " : ""}${esc(d.t)}</span></button>`;
+      })
+      .join("");
+    return `<div class="week"><h3>Semaine ${wi + 1} · ${esc(w.theme)}</h3>${days}</div>`;
+  }).join("");
+}
+
+// ---------- Chat ----------
+const MODE_INFO = {
+  lesson: { title: "Leçon du jour", kickoff: "Bonjour Camille ! Je suis prêt(e) pour la leçon." },
+  situation: { title: "Situation", kickoff: "(Commence la scène.)" },
+  listening: { title: "🎧 Écoute", kickoff: "Bonjour ! Je veux travailler la compréhension orale." },
+  academic: { title: "🎓 Français académique", kickoff: "Bonjour ! Je veux travailler le français pour l'université." },
+  free: { title: "💬 Conversation libre", kickoff: "Bonjour Camille !" },
+};
+
+function buildContext(mode, extra = {}) {
+  return {
+    mode,
+    profile: { ...state.profile },
+    notes: state.notes.slice(-30),
+    lessonDay: state.progress.lessonDay,
+    daysLeft: daysLeft(),
+    wordsKnown: state.cards.length,
+    dueWords: dueCards().slice(0, 12).map((c) => `${c.fr} (${c.en})`),
+    ...extra,
+  };
+}
+
+function startLesson() {
+  const day = state.progress.lessonDay;
+  const existing = state.chats.lesson;
+  if (!existing || existing.context.lessonDay !== day) delete state.chats.lesson;
+  openChat("lesson", () => buildContext("lesson"));
+}
+function startMode(mode) {
+  openChat(mode, () => buildContext(mode));
+}
+function startScenario(id) {
+  openChat(`situation:${id}`, () => buildContext("situation", { scenarioId: id }));
+}
+
+// The context (and so the system prompt) is frozen when a chat starts, which keeps
+// the prompt cache warm and the conversation consistent.
+function openChat(key, makeContext) {
+  if (!state.chats[key]) {
+    const mode = key.split(":")[0];
+    state.chats[key] = { context: makeContext(), messages: [{ role: "user", content: MODE_INFO[mode].kickoff, hidden: true }], created: Date.now() };
+    save();
+  }
+  currentChatKey = key;
+  go("chat");
+  const chat = state.chats[key];
+  const mode = chat.context.mode;
+  if (mode === "lesson") {
+    const l = lessonFor(chat.context.lessonDay);
+    $("#chat-title").textContent = `Leçon J${l.day} : ${l.t}`;
+    $("#chat-sub").textContent = `Semaine ${l.week} · ${l.theme}`;
+  } else if (mode === "situation") {
+    const s = SCENARIOS.find((x) => x.id === chat.context.scenarioId);
+    $("#chat-title").textContent = `${s.emoji} ${s.title}`;
+    $("#chat-sub").textContent = s.en;
+  } else {
+    $("#chat-title").textContent = MODE_INFO[mode].title;
+    $("#chat-sub").textContent = "avec Camille";
+  }
+  $("#btn-finish").hidden = mode !== "lesson";
+  $("#btn-autospeak").textContent = state.settings.autoSpeak ? "🔊" : "🔈";
+  renderMessages();
+  const last = chat.messages[chat.messages.length - 1];
+  if (last.role === "user") requestReply();
+  else $("#input").focus();
+}
+
+function renderMessages() {
+  const chat = state.chats[currentChatKey];
+  const box = $("#messages");
+  box.innerHTML = "";
+  chat.messages.forEach((m, i) => {
+    if (m.hidden) return;
+    box.appendChild(messageEl(m, i));
+  });
+  box.scrollTop = box.scrollHeight;
+}
+
+function messageEl(m, i) {
+  const el = document.createElement("div");
+  if (m.role === "user") {
+    el.className = "msg me";
+    el.textContent = m.content;
+    return el;
+  }
+  const raw = textOf(m.content);
+  el.className = "msg tutor";
+  el.dataset.i = i;
+  el.innerHTML = renderTutor(raw) + toolsHtml(raw);
+  return el;
+}
+function toolsHtml(raw) {
+  const n = glossesIn(raw).filter((g) => !hasCard(g.fr)).length;
+  return `<div class="tools"><button data-act="speak">🔊 Écouter</button>${n ? `<button data-act="addall">➕ ${n} mot${n > 1 ? "s" : ""} aux cartes</button>` : ""}</div>`;
+}
+
+// Claude answers on the viewer's own account through the `sample` capability.
+const samplePromise = window.claude ? window.claude.use("sample") : Promise.resolve(null);
+const MAX_TURNS = 40;
+const SAMPLE_ERRORS = {
+  not_granted: "Camille needs your permission to use Claude. Reload the page and choose Allow.",
+  sampling_disabled: "Claude isn't available on this account right now.",
+  rate_limited: "You've reached your Claude usage limit for now. Take a break and come back later. Flashcards still work!",
+  session_expired: "Please sign in to claude.ai again.",
+  refused: "Camille couldn't answer that one. Try rephrasing.",
+  prompt_too_large: "This conversation is too long. Press ↺ to start a new one.",
+};
+const HIDE_RETRY = new Set(["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"]);
+
+let busy = false;
+let replyCtl = null;
+async function requestReply() {
+  if (busy) return;
+  busy = true;
+  const key = currentChatKey;
+  const chat = state.chats[key];
+  const box = $("#messages");
+  const el = document.createElement("div");
+  el.className = "msg tutor typing";
+  el.innerHTML = `<span class="thinking">Camille réfléchit…</span>`;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+  $("#btn-send").disabled = true;
+
+  try {
+    const sample = await samplePromise;
+    if (!sample) throw { code: "unavailable_here" };
+    // Standing instructions go first as a user turn; then the most recent turns.
+    let turns = chat.messages.map(({ role, content }) => ({ role, content: textOf(content) || "…" }));
+    if (turns.length > MAX_TURNS) {
+      turns = turns.slice(-MAX_TURNS);
+      while (turns[0].role !== "user") turns.shift();
+    }
+    const input = [{ role: "user", content: `${buildSystemPrompt(chat.context)}\n\n(The conversation with the student starts below.)` }, ...turns];
+    replyCtl = new AbortController();
+    const { text } = await sample(input, {
+      cache: false,
+      signal: replyCtl.signal,
+      modelTier: state.settings.richReplies ? "default" : "quick",
+      onText: ({ text }) => {
+        if (currentChatKey !== key) return;
+        el.innerHTML = renderTutor(text, true);
+        box.scrollTop = box.scrollHeight;
+      },
+    });
+    chat.messages.push({ role: "assistant", content: text });
+    for (const m of text.matchAll(/\[note\]([\s\S]*?)\[\/note\]/g)) {
+      const note = m[1].trim();
+      if (note && !state.notes.includes(note)) state.notes.push(note);
+    }
+    state.notes = state.notes.slice(-40);
+    save();
+    el.classList.remove("typing");
+    el.dataset.i = chat.messages.length - 1;
+    el.innerHTML = renderTutor(text) + toolsHtml(text);
+    if (state.settings.autoSpeak && currentChatKey === key) speak(speakable(text));
+  } catch (err) {
+    if (err?.code === "cancelled") {
+      el.remove();
+      return;
+    }
+    el.className = "msg error";
+    el.textContent = "⚠️ " + (err?.code === "unavailable_here"
+      ? "Chatting needs this page to be opened in claude.ai (or the Claude app). Flashcards and the programme work anywhere."
+      : SAMPLE_ERRORS[err?.code] || "Couldn't reach Claude. Check your connection and try again.");
+    if (!HIDE_RETRY.has(err?.code) && err?.code !== "unavailable_here") {
+      const retry = document.createElement("button");
+      retry.className = "btn small";
+      retry.textContent = "Réessayer";
+      retry.style.marginLeft = "8px";
+      retry.onclick = () => {
+        el.remove();
+        requestReply();
+      };
+      el.appendChild(retry);
+    }
+  } finally {
+    busy = false;
+    replyCtl = null;
+    $("#btn-send").disabled = false;
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+function sendUser(text) {
+  text = text.trim();
+  if (!text || busy || !currentChatKey) return;
+  const chat = state.chats[currentChatKey];
+  chat.messages.push({ role: "user", content: text });
+  const mode = chat.context.mode;
+  markActive(mode === "lesson" ? null : "practice");
+  save();
+  $("#messages").appendChild(messageEl(chat.messages[chat.messages.length - 1]));
+  requestReply();
+}
+
+function finishLesson() {
+  const chat = state.chats.lesson;
+  const day = chat?.context.lessonDay ?? state.progress.lessonDay;
+  state.progress.completed[day] = today();
+  if (day === state.progress.lessonDay) state.progress.lessonDay = Math.min(TOTAL_DAYS, day + 1);
+  markActive("lesson");
+  delete state.chats.lesson;
+  save();
+  go("home");
+  toast(day === TOTAL_DAYS ? "🎉 Programme terminé ! Tu es prêt(e) pour la France !" : "🎉 Bravo ! Leçon terminée. À demain !");
+}
+
+// ---------- Flashcard review UI ----------
+let reviewCard = null;
+let revealed = false;
+function renderCards() {
+  renderStats();
+  const due = dueCards();
+  const a = todayActivity();
+  $("#cards-summary").textContent = `${state.cards.length} mot${state.cards.length === 1 ? "" : "s"} dans ton paquet · ${due.length} à revoir maintenant · ${a.cards} révisé${a.cards === 1 ? "" : "s"} aujourd'hui`;
+  const area = $("#review-area");
+  if (!due.length) {
+    reviewCard = null;
+    area.innerHTML = state.cards.length
+      ? `<div class="card empty"><h3>✨ C'est tout pour le moment !</h3><p class="muted">Come back later or learn new words in a lesson.</p></div>`
+      : `<div class="card empty"><h3>Ton paquet est vide</h3><p class="muted">Tap the <span class="gloss">underlined words</span> in Camille's messages and press ➕ to collect them here.</p></div>`;
+  } else {
+    reviewCard = due[0];
+    revealed = false;
+    // After two successful reviews, sometimes ask in the other direction (English → French).
+    reviewCard._reverse = reviewCard.reps >= 2 && Math.random() < 0.5;
+    drawCard();
+  }
+  renderWordList();
+}
+function drawCard() {
+  const c = reviewCard;
+  const area = $("#review-area");
+  const front = c._reverse ? c.en : c.fr;
+  const back = c._reverse ? c.fr : c.en;
+  const prompt = c._reverse ? "Dis-le en français (à voix haute !)" : "Qu'est-ce que ça veut dire ?";
+  area.innerHTML = `
+    <div class="flashcard" id="flashcard">
+      <div class="prompt">${prompt}</div>
+      <div class="front">${esc(front)}</div>
+      ${revealed ? `<div class="answer">${esc(back)}</div>` : ""}
+      <button class="btn small" data-act="say">🔊</button>
+    </div>
+    ${
+      revealed
+        ? `<div class="grades">
+            <button class="again" data-g="0">Encore<small>${nextIntervalLabel(c, 0)}</small></button>
+            <button data-g="1">Difficile<small>${nextIntervalLabel(c, 1)}</small></button>
+            <button class="good" data-g="2">Bien<small>${nextIntervalLabel(c, 2)}</small></button>
+            <button data-g="3">Facile<small>${nextIntervalLabel(c, 3)}</small></button>
+          </div>`
+        : `<button class="btn primary" style="width:100%;margin-bottom:18px" data-act="flip">Voir la réponse</button>`
+    }`;
+  if (!c._reverse && !revealed) speak(c.fr);
+  if (c._reverse && revealed) speak(c.fr);
+}
+function renderWordList() {
+  const q = norm($("#word-search").value || "");
+  const list = state.cards.filter((c) => !q || norm(c.fr).includes(q) || norm(c.en).includes(q)).sort((a, b) => b.created - a.created);
+  $("#word-list-summary").textContent = `📚 Tous mes mots (${state.cards.length})`;
+  $("#word-list").innerHTML = list
+    .map((c) => `<li><button data-say="${esc(c.fr)}" title="Écouter">🔊</button><span><b>${esc(c.fr)}</b> — ${esc(c.en)}</span><button data-del="${c.id}" title="Supprimer">🗑️</button></li>`)
+    .join("");
+}
+
+// ---------- Gloss popover ----------
+function showPopover(target) {
+  const fr = unesc(target.dataset.fr);
+  const en = unesc(target.dataset.en);
+  const pop = $("#popover");
+  const saved = hasCard(fr);
+  pop.innerHTML = `<div class="fr">${esc(fr)}</div><div class="en">${esc(en)}</div>
+    <div class="row"><button class="btn small" data-act="say">🔊</button>
+    <button class="btn small ${saved ? "" : "primary"}" data-act="add" ${saved ? "disabled" : ""}>${saved ? "✓ Dans tes cartes" : "➕ Ajouter"}</button></div>`;
+  pop.hidden = false;
+  pop._target = target;
+  pop._word = { fr, en };
+  const r = target.getBoundingClientRect();
+  const pw = pop.offsetWidth;
+  const ph = pop.offsetHeight;
+  let left = Math.min(Math.max(8, r.left + r.width / 2 - pw / 2), window.innerWidth - pw - 8);
+  let top = r.bottom + 8;
+  if (top + ph > window.innerHeight - 8) top = r.top - ph - 8;
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
+  speak(fr);
+}
+function hidePopover() {
+  $("#popover").hidden = true;
+}
+function refreshGlossMarks() {
+  document.querySelectorAll(".gloss[data-fr]").forEach((g) => g.classList.toggle("saved", hasCard(unesc(g.dataset.fr))));
+}
+
+// ---------- Settings ----------
+function openSettings(first = false) {
+  const f = $("#settings-form");
+  for (const k of ["name", "native", "destination", "field", "departure"]) f.elements[k].value = state.profile[k] || "";
+  f.elements.rate.value = state.settings.rate;
+  f.elements.rich.checked = !!state.settings.richReplies;
+  loadVoices();
+  $("#settings-title").textContent = first ? "Bienvenue ! 👋" : "Réglages";
+  $("#settings-intro").hidden = !first;
+  $("#data-tools").hidden = first;
+  $("#settings").showModal();
+}
+$("#settings-form").addEventListener("submit", () => {
+  const f = $("#settings-form");
+  for (const k of ["name", "native", "destination", "field", "departure"]) state.profile[k] = f.elements[k].value.trim();
+  state.settings.rate = parseFloat(f.elements.rate.value) || 0.9;
+  state.settings.voice = f.elements.voice.value;
+  state.settings.richReplies = f.elements.rich.checked;
+  state.onboarded = true;
+  save();
+  renderHome();
+});
+$("#btn-test-voice").onclick = () => {
+  const f = $("#settings-form");
+  state.settings.voice = f.elements.voice.value;
+  speak("Bonjour ! Je m'appelle Camille. On va bien s'amuser.", parseFloat(f.elements.rate.value));
+};
+$("#btn-reset").onclick = async () => {
+  $("#settings").close();
+  if (!(await askConfirm("Delete ALL your progress, flashcards and chats? This cannot be undone.", "Tout effacer"))) return;
+  state = defaultState();
+  save();
+  go("home");
+  openSettings(true);
+};
+
+// ---------- Events ----------
+document.addEventListener("click", (e) => {
+  const t = e.target;
+  const goBtn = t.closest("[data-go]");
+  if (goBtn) return go(goBtn.dataset.go);
+  const modeBtn = t.closest("[data-mode]");
+  if (modeBtn) return startMode(modeBtn.dataset.mode);
+  const sc = t.closest("[data-scenario]");
+  if (sc) return startScenario(sc.dataset.scenario);
+  const day = t.closest("[data-day]");
+  if (day) {
+    const n = +day.dataset.day;
+    const jump = () => {
+      state.progress.lessonDay = n;
+      save();
+      startLesson();
+    };
+    if (n > state.progress.lessonDay && !state.progress.completed[n]) {
+      askConfirm(`Skip ahead to day ${n}? You can always come back.`, "Aller au jour " + n).then((ok) => ok && jump());
+    } else jump();
+    return;
+  }
+
+  const gloss = t.closest(".gloss[data-fr]");
+  const pop = $("#popover");
+  if (gloss) return showPopover(gloss);
+  if (t.closest("#popover")) {
+    const act = t.closest("[data-act]")?.dataset.act;
+    if (act === "say") speak(pop._word.fr);
+    if (act === "add" && addCard(pop._word.fr, pop._word.en)) {
+      refreshGlossMarks();
+      showPopover(pop._target);
+    }
+    return;
+  }
+  hidePopover();
+
+  const eco = t.closest(".ecoute[data-audio]");
+  if (eco) {
+    const act = t.closest("[data-act]")?.dataset.act;
+    const audio = eco.dataset.audio;
+    if (act === "play") speak(audio);
+    if (act === "slow") speak(audio, Math.max(0.55, state.settings.rate - 0.25));
+    if (act === "reveal") {
+      const tr = eco.querySelector(".transcript");
+      tr.hidden = !tr.hidden;
+      t.textContent = tr.hidden ? "Voir le texte" : "Cacher le texte";
+    }
+    return;
+  }
+
+  const msg = t.closest(".msg.tutor[data-i]");
+  const msgAct = t.closest(".tools [data-act]")?.dataset.act;
+  if (msg && msgAct && currentChatKey) {
+    const raw = textOf(state.chats[currentChatKey].messages[+msg.dataset.i].content);
+    if (msgAct === "speak") speak(speakable(raw));
+    if (msgAct === "addall") {
+      const n = glossesIn(raw).filter((g) => addCard(g.fr, g.en, true)).length;
+      toast(`➕ ${n} mot${n > 1 ? "s" : ""} ajouté${n > 1 ? "s" : ""} à tes cartes`);
+      t.remove();
+      refreshGlossMarks();
+    }
+    return;
+  }
+
+  const chip = t.closest("#chips [data-say]");
+  if (chip) return sendUser(chip.dataset.say);
+
+  const say = t.closest("[data-say]");
+  if (say) return speak(say.dataset.say);
+  const del = t.closest("[data-del]");
+  if (del) {
+    state.cards = state.cards.filter((c) => c.id !== del.dataset.del);
+    save();
+    return renderCards();
+  }
+
+  if (!$("#view-cards").hidden && reviewCard) {
+    const act = t.closest("[data-act]")?.dataset.act;
+    if (act === "flip") {
+      revealed = true;
+      drawCard();
+    } else if (act === "say") speak(reviewCard.fr);
+    const g = t.closest("[data-g]");
+    if (g) {
+      delete reviewCard._reverse;
+      grade(reviewCard, +g.dataset.g);
+      save();
+      renderCards();
+    }
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if ($("#view-cards").hidden || !reviewCard || e.target.matches("input, textarea")) return;
+  if (!revealed && (e.key === " " || e.key === "Enter")) {
+    e.preventDefault();
+    revealed = true;
+    drawCard();
+  } else if (revealed && ["1", "2", "3", "4"].includes(e.key)) {
+    delete reviewCard._reverse;
+    grade(reviewCard, +e.key - 1);
+    save();
+    renderCards();
+  }
+});
+
+$("#btn-lesson").onclick = startLesson;
+$("#btn-settings").onclick = () => openSettings(false);
+$("#chat-back").onclick = () => go("home");
+$("#btn-finish").onclick = finishLesson;
+$("#btn-autospeak").onclick = () => {
+  state.settings.autoSpeak = !state.settings.autoSpeak;
+  save();
+  $("#btn-autospeak").textContent = state.settings.autoSpeak ? "🔊" : "🔈";
+  toast(state.settings.autoSpeak ? "Lecture automatique activée" : "Lecture automatique désactivée");
+  if (!state.settings.autoSpeak) speechSynthesis?.cancel();
+};
+$("#btn-restart").onclick = async () => {
+  if (!currentChatKey || busy || !(await askConfirm("Start this conversation over?", "Recommencer"))) return;
+  const key = currentChatKey;
+  delete state.chats[key];
+  save();
+  if (key === "lesson") startLesson();
+  else if (key.startsWith("situation:")) startScenario(key.split(":")[1]);
+  else startMode(key);
+};
+
+const input = $("#input");
+function autosize() {
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 140) + "px";
+}
+input.addEventListener("input", autosize);
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+    e.preventDefault();
+    $("#composer-form").requestSubmit();
+  }
+});
+$("#composer-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (busy) return;
+  const v = input.value;
+  input.value = "";
+  autosize();
+  sendUser(v);
+});
+$("#add-card-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const f = e.target;
+  if (addCard(f.fr.value.trim(), f.en.value.trim())) {
+    f.reset();
+    renderCards();
+  } else toast("Already in your deck");
+});
+$("#word-search").addEventListener("input", renderWordList);
+
+// ---------- Boot ----------
+go("home");
+initAccountStorage().then((synced) => {
+  $("#sync-status").textContent = synced
+    ? "✅ Your progress and flashcards are saved to your Claude account, so they follow you on every device."
+    : "Your progress is saved in this browser only.";
+  if (!currentChatKey) go(!$("#view-cards").hidden ? "cards" : "home");
+  if (!state.onboarded && !$("#settings").open) openSettings(true);
+});
+
+</script>

@@ -83,7 +83,6 @@
         <button id="btn-finish" class="finish" hidden>✅ Leçon terminée</button>
       </div>
       <form id="composer-form">
-        <button type="button" class="icon-btn mic" id="btn-mic" title="Parler (français)">🎤</button>
         <textarea id="input" rows="1" placeholder="Écris en français…" autocomplete="off"></textarea>
         <button type="submit" class="btn primary send" id="btn-send" aria-label="Envoyer">➤</button>
       </form>
@@ -126,17 +125,24 @@
         <label>Speed <input name="rate" type="range" min="0.6" max="1.2" step="0.05"></label>
         <button type="button" class="btn small" id="btn-test-voice">🔊 Tester</button>
       </fieldset>
+      <label class="check"><input type="checkbox" name="rich" id="rich"> Richer, slower replies <small class="muted">Off: Camille answers fast. On: more careful answers that take longer.</small></label>
       <details id="data-tools">
-        <summary>Sauvegarde (backup)</summary>
-        <p class="tiny muted">Your progress is saved in this browser. Export it to move to another device.</p>
-        <div class="row">
-          <button type="button" class="btn small" id="btn-export">Exporter</button>
-          <label class="btn small">Importer <input type="file" id="import-file" accept="application/json" hidden></label>
-          <button type="button" class="btn small danger" id="btn-reset">Tout effacer</button>
-        </div>
+        <summary>Données</summary>
+        <p class="tiny muted" id="sync-status">Checking where your progress is saved…</p>
+        <button type="button" class="btn small danger" id="btn-reset">Tout effacer</button>
       </details>
       <div class="row end">
         <button class="btn primary" value="save">C'est parti !</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm">
+    <form method="dialog" class="stack">
+      <p id="confirm-text"></p>
+      <div class="row end">
+        <button class="btn" value="cancel">Annuler</button>
+        <button class="btn primary" value="ok" id="confirm-ok">Oui</button>
       </div>
     </form>
   </dialog>

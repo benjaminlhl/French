@@ -1,4 +1,4 @@
-import { SCENARIOS, lessonFor, levelFor } from "./public/curriculum.js";
+import { SCENARIOS, lessonFor, levelFor } from "./curriculum.js";
 
 const clip = (s, n) => String(s ?? "").slice(0, n).trim();
 
@@ -102,9 +102,4 @@ Start with a short, friendly opening question.`;
 
 export function buildSystemPrompt(ctx = {}) {
   return `${CORE}\n\n${learnerSection(ctx)}\n\n${modeSection(ctx)}`;
-}
-
-// Low effort keeps replies snappy; structured lessons get a bit more thought.
-export function effortFor(ctx = {}) {
-  return ctx.mode === "lesson" || ctx.mode === "academic" ? "medium" : "low";
 }

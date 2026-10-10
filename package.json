@@ -1,17 +1,10 @@
 {
-  "name": "french-tutor",
-  "version": "1.0.0",
-  "description": "Camille - an AI French tutor for students preparing to study in France",
+  "name": "camille-french-tutor",
+  "version": "2.0.0",
+  "description": "Camille - a free AI French tutor that runs as a Claude Artifact",
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node server.js",
-    "check": "node --check server.js && node --check prompts.js && node --check public/app.js && node --check public/curriculum.js"
-  },
-  "engines": {
-    "node": ">=20.12"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.133.0"
+    "build": "node build.mjs"
   }
 }

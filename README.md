@@ -1,6 +1,6 @@
-# 🥐 Camille, your AI French tutor
+# 🥐 Camille, your free AI French tutor
 
-A personal French tutor, powered by Claude, for going from **complete beginner to confident A2 (with B1 survival skills)** in the 12 weeks before you start studying in France. It's built around **30 minutes a day**, mostly in French, with a focus on daily-life speaking, academic French and listening.
+A personal French tutor, powered by Claude, for going from **complete beginner to confident A2 (with B1 survival skills)** in the 12 weeks before you start studying in France. It's free to run and built around **30 minutes a day**, mostly in French, with a focus on daily-life speaking, academic French and listening.
 
 ## What you get
 
@@ -16,41 +16,35 @@ A personal French tutor, powered by Claude, for going from **complete beginner t
 How it teaches:
 - **Immersion with a safety net.** Camille writes simple French and glosses new words. The chips under the chat give you 🇬🇧 *En anglais*, 🐢 *Plus simple*, 💡 *Indice* and ⏭️ *Suivant*, and you can always write in English.
 - **Corrections** appear as ✏️ lines (the 2 most important mistakes, with a short reason) before the conversation continues.
-- **Speaking.** Press 🎤 to talk in French (Chrome, Edge or Safari). Press 🔊 to hear any message, or turn on auto-read in the chat header. You can choose the French voice and speed in ⚙️.
+- **Listening.** Press 🔊 to hear any message, or turn on auto-read in the chat header. You can choose the French voice and speed in ⚙️.
 - **Memory.** Camille keeps private notes about your recurring mistakes, strengths and interests, and uses them in later sessions.
 - **Daily plan and streak.** The home screen shows today's 30-minute plan (cards → lesson → listening/situation), your 🔥 streak and a ✈️ countdown to your departure.
 
-## Setup (5 minutes)
+## How to use it (free, no API key)
 
-You need [Node.js](https://nodejs.org/) 20.12 or newer and an Anthropic API key from https://console.anthropic.com/.
+Camille runs as a **Claude Artifact**, a page inside claude.ai. When you chat, Claude answers on **your own Claude account**, so there is no API key and no extra cost. Messages count toward your normal Claude usage limits, the same as chatting with Claude.
 
-```bash
-git clone <this repo> && cd French
-npm install
-cp .env.example .env        # then open .env and paste your API key
-npm start
-```
+1. Open the artifact link in your browser or in the Claude app on your phone (claude.ai → Artifacts).
+2. The first time Camille speaks, claude.ai asks you to **allow** the page to use Claude. Choose Allow.
+3. Fill in the short welcome form, then start lesson 1.
 
-Open **http://localhost:3000** in Chrome, Edge or Safari. The first screen asks a few questions about you (name, languages you speak, where you're going, what you'll study, departure date) so lessons fit your life.
+Your progress, notes and flashcards are saved privately to your Claude account, so they follow you between computer and phone. Chats in progress stay in the browser you used.
 
-### Using it on your phone
-Set `HOST=0.0.0.0` in `.env`, restart, and open `http://<your-computer's-IP>:3000` on your phone (same Wi-Fi). Audio playback works. The 🎤 microphone needs a secure origin, so on the phone it only works over https (for example through a tunnel such as `cloudflared` or `ngrok`). Only open the port on networks you trust: anyone who can reach it can use your API key.
-
-### Your data
-Progress, flashcards and chats are stored in your browser (localStorage). Use ⚙️ → *Sauvegarde* to export or import a backup, for example to move to another device.
-
-## Cost
-It uses `claude-opus-5-5` (override with `TUTOR_MODEL` in `.env`) at low effort for conversation and medium effort for lessons, with prompt caching. A 30-minute session typically costs roughly $0.30–$1, depending on how much you chat. Switch to `claude-sonnet-5-5` to roughly halve that. Check usage in the Anthropic console.
+Good to know:
+- Replies are fast by default. For more careful (slower) answers, turn on *Richer, slower replies* in ⚙️.
+- There's no microphone input (claude.ai pages can't use the mic), so type your answers. To practise speaking, read the French out loud before you type it. 🔊 audio playback works everywhere.
+- If you hit your Claude usage limit, flashcards and the programme still work, and Camille is back when your limit resets.
 
 ## Project layout
 
 ```
-server.js            Tiny Node server: static files + /api/chat streaming endpoint (Anthropic SDK)
-prompts.js           Camille's teaching method + per-mode instructions (lesson, role-play, listening…)
-public/curriculum.js 12-week programme and the role-play scenarios
-public/app.js        The app: chat, rendering, speech, flashcards, progress
-public/index.html    Layout
-public/style.css     Styles (light and dark mode)
+src/body.html       Page layout
+src/style.css       Styles (light and dark)
+src/curriculum.js   12-week programme and role-play scenarios
+src/prompts.js      Camille's teaching method + per-mode instructions
+src/app.js          Chat, rendering, speech, flashcards, progress, account storage
+build.mjs           Bundles src/ into camille.html (run: node build.mjs)
+camille.html        The single page published as the artifact
 ```
 
 Bon courage et bon voyage ! 🇫🇷

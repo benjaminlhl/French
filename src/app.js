@@ -1,4 +1,5 @@
 import { WEEKS, TOTAL_DAYS, SCENARIOS, lessonFor, levelFor } from "./curriculum.js";
+import { buildSystemPrompt } from "./prompts.js";
 
 // ---------- State ----------
 const STORE_KEY = "camille.v1";
@@ -14,20 +15,82 @@ const defaultState = () => ({
   onboarded: false,
 });
 
-let state = load();
+// Progress, notes and flashcards are saved to the viewer's Claude account (db
+// capability, private per person) so they follow them across devices. The browser
+// keeps a cache, and also the chats, which are a convenience.
+const CHATS_KEY = "camille.chats.v1";
+let state = loadLocal();
+const remote = { main: null, cards: null, written: {}, timer: null, writing: false };
 
-function load() {
+function loadLocal() {
+  const s = defaultState();
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return deepMerge(defaultState(), JSON.parse(raw));
+    if (raw) deepMerge(s, JSON.parse(raw));
+    const chats = localStorage.getItem(CHATS_KEY);
+    if (chats) s.chats = JSON.parse(chats);
   } catch {}
-  return defaultState();
+  return s;
 }
+const mainDoc = () => {
+  const { profile, progress, notes, settings, onboarded } = state;
+  return { profile, progress, notes, settings, onboarded };
+};
 function save() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORE_KEY, JSON.stringify({ ...mainDoc(), cards: state.cards }));
+    localStorage.setItem(CHATS_KEY, JSON.stringify(state.chats));
+  } catch {}
+  if (remote.main) {
+    clearTimeout(remote.timer);
+    remote.timer = setTimeout(flushRemote, 1200);
+  }
+}
+async function flushRemote() {
+  if (remote.writing) {
+    remote.timer = setTimeout(flushRemote, 600);
+    return;
+  }
+  remote.writing = true;
+  try {
+    for (const [key, ref, body] of [
+      ["main", remote.main, mainDoc()],
+      ["cards", remote.cards, { list: state.cards }],
+    ]) {
+      const json = JSON.stringify(body);
+      if (remote.written[key] === json) continue;
+      await ref.set(JSON.parse(json));
+      remote.written[key] = json;
+    }
   } catch (e) {
-    toast("⚠️ Couldn't save progress (storage full?)");
+    if (e?.code === "quota_exceeded") toast("⚠️ Storage full: delete some flashcards");
+    else if (e?.code === "unavailable") remote.timer = setTimeout(flushRemote, 3000 + Math.random() * 2000);
+  } finally {
+    remote.writing = false;
+  }
+}
+async function initAccountStorage() {
+  try {
+    const [db, user] = await Promise.all([window.claude?.use("db"), window.claude?.use("user")]);
+    const uid = db && user ? await user.id() : null;
+    if (!uid) return false;
+    const mainRef = db.doc(`data/users/${uid}/main`);
+    const cardsRef = db.doc(`data/users/${uid}/cards`);
+    const [m, c] = await Promise.all([mainRef.get(), cardsRef.get()]);
+    if (m.exists) {
+      const chats = state.chats;
+      state = deepMerge(defaultState(), structuredClone(m.data()));
+      state.chats = chats;
+      state.cards = c.exists && Array.isArray(c.data().list) ? structuredClone(c.data().list) : [];
+      remote.written.main = JSON.stringify(mainDoc());
+      remote.written.cards = JSON.stringify({ list: state.cards });
+    }
+    remote.main = mainRef;
+    remote.cards = cardsRef;
+    save(); // first visit on this account: uploads what this browser had
+    return true;
+  } catch {
+    return false;
   }
 }
 function deepMerge(base, extra) {
@@ -122,38 +185,15 @@ function speakable(text) {
     .trim();
 }
 
-// ---------- Speech recognition ----------
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recog = null;
-function toggleMic() {
-  const btn = $("#btn-mic");
-  if (recog) {
-    recog.stop();
-    return;
-  }
-  recog = new SR();
-  recog.lang = "fr-FR";
-  recog.interimResults = true;
-  recog.continuous = false;
-  const input = $("#input");
-  const base = input.value ? input.value.trimEnd() + " " : "";
-  recog.onresult = (e) => {
-    let txt = "";
-    for (const r of e.results) txt += r[0].transcript;
-    input.value = base + txt;
-    autosize();
-  };
-  recog.onerror = (e) => {
-    if (e.error === "not-allowed") toast("Microphone blocked. Allow it in the browser (needs localhost or https).");
-  };
-  recog.onend = () => {
-    recog = null;
-    btn.classList.remove("listening");
-    input.focus();
-  };
-  btn.classList.add("listening");
-  speechSynthesis?.cancel();
-  recog.start();
+// ---------- Confirm (the artifact viewer blocks window.confirm) ----------
+function askConfirm(message, okLabel = "Oui") {
+  const dlg = $("#confirm");
+  $("#confirm-text").textContent = message;
+  $("#confirm-ok").textContent = okLabel;
+  dlg.showModal();
+  return new Promise((resolve) => {
+    dlg.onclose = () => resolve(dlg.returnValue === "ok");
+  });
 }
 
 // ---------- Tutor text rendering ----------
@@ -298,6 +338,7 @@ let currentChatKey = null;
 
 function go(view) {
   if (view !== "chat") {
+    replyCtl?.abort();
     speechSynthesis?.cancel();
     currentChatKey = null;
   }
@@ -472,7 +513,21 @@ function toolsHtml(raw) {
   return `<div class="tools"><button data-act="speak">🔊 Écouter</button>${n ? `<button data-act="addall">➕ ${n} mot${n > 1 ? "s" : ""} aux cartes</button>` : ""}</div>`;
 }
 
+// Claude answers on the viewer's own account through the `sample` capability.
+const samplePromise = window.claude ? window.claude.use("sample") : Promise.resolve(null);
+const MAX_TURNS = 40;
+const SAMPLE_ERRORS = {
+  not_granted: "Camille needs your permission to use Claude. Reload the page and choose Allow.",
+  sampling_disabled: "Claude isn't available on this account right now.",
+  rate_limited: "You've reached your Claude usage limit for now. Take a break and come back later. Flashcards still work!",
+  session_expired: "Please sign in to claude.ai again.",
+  refused: "Camille couldn't answer that one. Try rephrasing.",
+  prompt_too_large: "This conversation is too long. Press ↺ to start a new one.",
+};
+const HIDE_RETRY = new Set(["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"]);
+
 let busy = false;
+let replyCtl = null;
 async function requestReply() {
   if (busy) return;
   busy = true;
@@ -481,46 +536,33 @@ async function requestReply() {
   const box = $("#messages");
   const el = document.createElement("div");
   el.className = "msg tutor typing";
+  el.innerHTML = `<span class="thinking">Camille réfléchit…</span>`;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
   $("#btn-send").disabled = true;
 
-  let raw = "";
   try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ context: chat.context, messages: chat.messages.map(({ role, content }) => ({ role, content })) }),
-    });
-    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Server error ${res.status}`);
-    const reader = res.body.getReader();
-    const dec = new TextDecoder();
-    let buf = "";
-    let final = null;
-    for (;;) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buf += dec.decode(value, { stream: true });
-      let nl;
-      while ((nl = buf.indexOf("\n")) >= 0) {
-        const line = buf.slice(0, nl);
-        buf = buf.slice(nl + 1);
-        if (!line.trim()) continue;
-        const ev = JSON.parse(line);
-        if (ev.type === "text") {
-          raw += ev.text;
-          if (currentChatKey === key) {
-            el.innerHTML = renderTutor(raw, true);
-            box.scrollTop = box.scrollHeight;
-          }
-        } else if (ev.type === "done") final = ev;
-        else if (ev.type === "error") throw new Error(ev.message);
-      }
+    const sample = await samplePromise;
+    if (!sample) throw { code: "unavailable_here" };
+    // Standing instructions go first as a user turn; then the most recent turns.
+    let turns = chat.messages.map(({ role, content }) => ({ role, content: textOf(content) || "…" }));
+    if (turns.length > MAX_TURNS) {
+      turns = turns.slice(-MAX_TURNS);
+      while (turns[0].role !== "user") turns.shift();
     }
-    if (!final) throw new Error("The connection was interrupted.");
-    // Store the assistant turn exactly as the API returned it.
-    chat.messages.push({ role: "assistant", content: final.content });
-    const text = textOf(final.content);
+    const input = [{ role: "user", content: `${buildSystemPrompt(chat.context)}\n\n(The conversation with the student starts below.)` }, ...turns];
+    replyCtl = new AbortController();
+    const { text } = await sample(input, {
+      cache: false,
+      signal: replyCtl.signal,
+      modelTier: state.settings.richReplies ? "default" : "quick",
+      onText: ({ text }) => {
+        if (currentChatKey !== key) return;
+        el.innerHTML = renderTutor(text, true);
+        box.scrollTop = box.scrollHeight;
+      },
+    });
+    chat.messages.push({ role: "assistant", content: text });
     for (const m of text.matchAll(/\[note\]([\s\S]*?)\[\/note\]/g)) {
       const note = m[1].trim();
       if (note && !state.notes.includes(note)) state.notes.push(note);
@@ -532,19 +574,28 @@ async function requestReply() {
     el.innerHTML = renderTutor(text) + toolsHtml(text);
     if (state.settings.autoSpeak && currentChatKey === key) speak(speakable(text));
   } catch (err) {
-    el.className = "msg error";
-    el.textContent = `⚠️ ${err.message}`;
-    const retry = document.createElement("button");
-    retry.className = "btn small";
-    retry.textContent = "Réessayer";
-    retry.style.marginLeft = "8px";
-    retry.onclick = () => {
+    if (err?.code === "cancelled") {
       el.remove();
-      requestReply();
-    };
-    el.appendChild(retry);
+      return;
+    }
+    el.className = "msg error";
+    el.textContent = "⚠️ " + (err?.code === "unavailable_here"
+      ? "Chatting needs this page to be opened in claude.ai (or the Claude app). Flashcards and the programme work anywhere."
+      : SAMPLE_ERRORS[err?.code] || "Couldn't reach Claude. Check your connection and try again.");
+    if (!HIDE_RETRY.has(err?.code) && err?.code !== "unavailable_here") {
+      const retry = document.createElement("button");
+      retry.className = "btn small";
+      retry.textContent = "Réessayer";
+      retry.style.marginLeft = "8px";
+      retry.onclick = () => {
+        el.remove();
+        requestReply();
+      };
+      el.appendChild(retry);
+    }
   } finally {
     busy = false;
+    replyCtl = null;
     $("#btn-send").disabled = false;
     box.scrollTop = box.scrollHeight;
   }
@@ -666,6 +717,7 @@ function openSettings(first = false) {
   const f = $("#settings-form");
   for (const k of ["name", "native", "destination", "field", "departure"]) f.elements[k].value = state.profile[k] || "";
   f.elements.rate.value = state.settings.rate;
+  f.elements.rich.checked = !!state.settings.richReplies;
   loadVoices();
   $("#settings-title").textContent = first ? "Bienvenue ! 👋" : "Réglages";
   $("#settings-intro").hidden = !first;
@@ -677,6 +729,7 @@ $("#settings-form").addEventListener("submit", () => {
   for (const k of ["name", "native", "destination", "field", "departure"]) state.profile[k] = f.elements[k].value.trim();
   state.settings.rate = parseFloat(f.elements.rate.value) || 0.9;
   state.settings.voice = f.elements.voice.value;
+  state.settings.richReplies = f.elements.rich.checked;
   state.onboarded = true;
   save();
   renderHome();
@@ -686,32 +739,11 @@ $("#btn-test-voice").onclick = () => {
   state.settings.voice = f.elements.voice.value;
   speak("Bonjour ! Je m'appelle Camille. On va bien s'amuser.", parseFloat(f.elements.rate.value));
 };
-$("#btn-export").onclick = () => {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `camille-progress-${today()}.json`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-};
-$("#import-file").onchange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    state = deepMerge(defaultState(), JSON.parse(await file.text()));
-    save();
-    $("#settings").close();
-    go("home");
-    toast("✅ Progrès importés");
-  } catch {
-    toast("⚠️ That file isn't a valid backup");
-  }
-};
-$("#btn-reset").onclick = () => {
-  if (!confirm("Delete ALL progress, cards and chats? This cannot be undone.")) return;
+$("#btn-reset").onclick = async () => {
+  $("#settings").close();
+  if (!(await askConfirm("Delete ALL your progress, flashcards and chats? This cannot be undone.", "Tout effacer"))) return;
   state = defaultState();
   save();
-  $("#settings").close();
   go("home");
   openSettings(true);
 };
@@ -728,11 +760,15 @@ document.addEventListener("click", (e) => {
   const day = t.closest("[data-day]");
   if (day) {
     const n = +day.dataset.day;
-    if (n !== state.progress.lessonDay && !state.progress.completed[n] && n > state.progress.lessonDay &&
-        !confirm(`Skip ahead to day ${n}? (You can always come back.)`)) return;
-    state.progress.lessonDay = n;
-    save();
-    return startLesson();
+    const jump = () => {
+      state.progress.lessonDay = n;
+      save();
+      startLesson();
+    };
+    if (n > state.progress.lessonDay && !state.progress.completed[n]) {
+      askConfirm(`Skip ahead to day ${n}? You can always come back.`, "Aller au jour " + n).then((ok) => ok && jump());
+    } else jump();
+    return;
   }
 
   const gloss = t.closest(".gloss[data-fr]");
@@ -830,8 +866,8 @@ $("#btn-autospeak").onclick = () => {
   toast(state.settings.autoSpeak ? "Lecture automatique activée" : "Lecture automatique désactivée");
   if (!state.settings.autoSpeak) speechSynthesis?.cancel();
 };
-$("#btn-restart").onclick = () => {
-  if (!currentChatKey || busy || !confirm("Start this conversation over?")) return;
+$("#btn-restart").onclick = async () => {
+  if (!currentChatKey || busy || !(await askConfirm("Start this conversation over?", "Recommencer"))) return;
   const key = currentChatKey;
   delete state.chats[key];
   save();
@@ -860,8 +896,6 @@ $("#composer-form").addEventListener("submit", (e) => {
   autosize();
   sendUser(v);
 });
-if (SR) $("#btn-mic").onclick = toggleMic;
-else $("#btn-mic").hidden = true;
 $("#add-card-form").addEventListener("submit", (e) => {
   e.preventDefault();
   const f = e.target;
@@ -874,4 +908,10 @@ $("#word-search").addEventListener("input", renderWordList);
 
 // ---------- Boot ----------
 go("home");
-if (!state.onboarded) openSettings(true);
+initAccountStorage().then((synced) => {
+  $("#sync-status").textContent = synced
+    ? "✅ Your progress and flashcards are saved to your Claude account, so they follow you on every device."
+    : "Your progress is saved in this browser only.";
+  if (!currentChatKey) go(!$("#view-cards").hidden ? "cards" : "home");
+  if (!state.onboarded && !$("#settings").open) openSettings(true);
+});
