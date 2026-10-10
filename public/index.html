@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f4fd1">
+  <title>Camille, ta prof de français</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥐</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="brand" data-go="home" aria-label="Accueil">
+      <span class="flag" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>Camille</span>
+    </button>
+    <div class="stats">
+      <span id="stat-countdown" title="Jours avant le départ"></span>
+      <span id="stat-streak" title="Jours d'affilée"></span>
+      <button id="btn-settings" class="icon-btn" aria-label="Réglages">⚙️</button>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <main id="view-home" class="view">
+    <section class="hero">
+      <h1 id="hello">Bonjour !</h1>
+      <p class="sub" id="hello-sub">Ton plan de 30 minutes pour aujourd'hui :</p>
+      <ol class="plan" id="today-plan"></ol>
+    </section>
+
+    <section class="card lesson-card">
+      <div class="eyebrow" id="lesson-eyebrow"></div>
+      <h2 id="lesson-title"></h2>
+      <p class="muted" id="lesson-goals"></p>
+      <div class="progress"><div id="course-bar"></div></div>
+      <p class="tiny muted" id="course-label"></p>
+      <button class="btn primary" id="btn-lesson">Commencer la leçon</button>
+    </section>
+
+    <section>
+      <h3 class="section-title">S'entraîner</h3>
+      <div class="grid">
+        <button class="tile" data-go="situations"><span>🎭</span><b>Situations</b><small>Role-play real life in France</small></button>
+        <button class="tile" data-mode="listening"><span>🎧</span><b>Écoute</b><small>Train your ear</small></button>
+        <button class="tile" data-mode="academic"><span>🎓</span><b>Français académique</b><small>Lectures, emails, class</small></button>
+        <button class="tile" data-mode="free"><span>💬</span><b>Conversation libre</b><small>Chat about anything</small></button>
+        <button class="tile" data-go="cards"><span>🃏</span><b>Mes cartes</b><small id="tile-cards">Spaced repetition</small></button>
+        <button class="tile" data-go="course"><span>🗺️</span><b>Le programme</b><small>12 weeks to France</small></button>
+      </div>
+    </section>
+  </main>
+
+  <!-- SITUATIONS -->
+  <main id="view-situations" class="view" hidden>
+    <div class="view-head"><button class="back" data-go="home">←</button><h2>Situations</h2></div>
+    <p class="muted">Pick a scene. Camille plays the other person. You'll get help if you get stuck, and a debrief at the end.</p>
+    <div class="grid" id="scenario-grid"></div>
+  </main>
+
+  <!-- COURSE -->
+  <main id="view-course" class="view" hidden>
+    <div class="view-head"><button class="back" data-go="home">←</button><h2>Le programme</h2></div>
+    <p class="muted">12 weeks, 6 lessons + 1 review per week. Tap a lesson to (re)do it.</p>
+    <div id="course-list"></div>
+  </main>
+
+  <!-- CHAT -->
+  <main id="view-chat" class="view chat-view" hidden>
+    <div class="chat-head">
+      <button class="back" id="chat-back">←</button>
+      <div class="chat-title"><b id="chat-title"></b><small id="chat-sub"></small></div>
+      <button class="icon-btn" id="btn-autospeak" title="Lire les réponses à voix haute">🔈</button>
+      <button class="icon-btn" id="btn-restart" title="Recommencer">↺</button>
+    </div>
+    <div id="messages" class="messages" aria-live="polite"></div>
+    <div class="composer">
+      <div class="chips" id="chips">
+        <button data-say="Peux-tu expliquer ça en anglais ?">🇬🇧 En anglais</button>
+        <button data-say="Plus simple, s'il te plaît !">🐢 Plus simple</button>
+        <button data-say="Je peux avoir un indice ?">💡 Indice</button>
+        <button data-say="On continue !">⏭️ Suivant</button>
+        <button id="btn-finish" class="finish" hidden>✅ Leçon terminée</button>
+      </div>
+      <form id="composer-form">
+        <button type="button" class="icon-btn mic" id="btn-mic" title="Parler (français)">🎤</button>
+        <textarea id="input" rows="1" placeholder="Écris en français…" autocomplete="off"></textarea>
+        <button type="submit" class="btn primary send" id="btn-send" aria-label="Envoyer">➤</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- CARDS -->
+  <main id="view-cards" class="view" hidden>
+    <div class="view-head"><button class="back" data-go="home">←</button><h2>Mes cartes</h2></div>
+    <p class="muted" id="cards-summary"></p>
+    <div id="review-area"></div>
+    <details class="card">
+      <summary>➕ Ajouter un mot</summary>
+      <form id="add-card-form" class="stack">
+        <input name="fr" placeholder="Français (ex : le loyer)" required>
+        <input name="en" placeholder="English (e.g. the rent)" required>
+        <button class="btn">Ajouter</button>
+      </form>
+    </details>
+    <details class="card">
+      <summary id="word-list-summary">📚 Tous mes mots</summary>
+      <input id="word-search" placeholder="Rechercher…">
+      <ul id="word-list" class="word-list"></ul>
+    </details>
+  </main>
+
+  <!-- SETTINGS / ONBOARDING -->
+  <dialog id="settings">
+    <form method="dialog" id="settings-form" class="stack">
+      <h2 id="settings-title">Réglages</h2>
+      <p class="muted" id="settings-intro" hidden>Bienvenue ! Tell Camille a little about yourself so lessons fit your life in France.</p>
+      <label>Ton prénom <input name="name" placeholder="e.g. Ben"></label>
+      <label>Languages you already speak <input name="native" placeholder="e.g. English, Cantonese"></label>
+      <label>Where are you going? <input name="destination" placeholder="e.g. Université de Lyon"></label>
+      <label>What will you study? <input name="field" placeholder="e.g. Business, Engineering"></label>
+      <label>Departure date <input name="departure" type="date"></label>
+      <fieldset class="voice-settings">
+        <legend>Voix</legend>
+        <label>French voice <select name="voice" id="voice-select"></select></label>
+        <label>Speed <input name="rate" type="range" min="0.6" max="1.2" step="0.05"></label>
+        <button type="button" class="btn small" id="btn-test-voice">🔊 Tester</button>
+      </fieldset>
+      <details id="data-tools">
+        <summary>Sauvegarde (backup)</summary>
+        <p class="tiny muted">Your progress is saved in this browser. Export it to move to another device.</p>
+        <div class="row">
+          <button type="button" class="btn small" id="btn-export">Exporter</button>
+          <label class="btn small">Importer <input type="file" id="import-file" accept="application/json" hidden></label>
+          <button type="button" class="btn small danger" id="btn-reset">Tout effacer</button>
+        </div>
+      </details>
+      <div class="row end">
+        <button class="btn primary" value="save">C'est parti !</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="popover" class="popover" hidden></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
